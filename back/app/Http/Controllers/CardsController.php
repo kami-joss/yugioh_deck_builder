@@ -14,7 +14,7 @@ class CardsController extends Controller
      */
     public function index()
     {
-        $cards = Card::with('image')->paginate(50);
+        $cards = Card::with('image_small')->filtered(request()->only('name'))->paginate(10);
         return response()->json($cards, 200);
     }
 
