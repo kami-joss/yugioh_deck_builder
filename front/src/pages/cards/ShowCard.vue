@@ -21,8 +21,8 @@
 import { onMounted, ref } from "vue";
 import { api } from "boot/axios";
 import { useRoute } from "vue-router";
-import DescMonsterCard from "components/cards/DescMonsterCard.vue";
-import DescSpellCard from "components/cards/DescSpellCard.vue";
+import DescMonsterCard from "../../components/cards/DescMonsterCard.vue";
+import DescSpellCard from "../../components/cards/DescSpellCard.vue";
 
 const loading = ref(true);
 const params = useRoute().params;

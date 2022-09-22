@@ -6,3 +6,15 @@
 .card-desc_section {
   padding: 10px;
 }
+
+a {
+  color: #100b0f;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.index-card:hover {
+  box-shadow: 5px 5px 5px 5px #b3b3b3;
+  border: solid 1px #b3b3b3;
+  transition-duration: 0.25s;
+}

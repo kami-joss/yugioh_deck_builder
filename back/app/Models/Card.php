@@ -32,4 +32,18 @@ class Card extends Model
     {
         return $this->belongsTo(Image::class);
     }
+
+    public function image_small()
+    {
+        return $this->belongsTo(Image::class, 'image_small_id', 'id');
+    }
+
+    // SCOPES
+
+    public function scopeFiltered($query, $filters)
+    {
+        if (array_key_exists('name', $filters)) {
+            $query->where('name', 'like', '%' . $filters['name'] . '%');
+        }
+    }
 }

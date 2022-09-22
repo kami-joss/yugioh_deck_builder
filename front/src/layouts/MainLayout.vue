@@ -16,6 +16,12 @@
           Yu-gi-oh!
         </q-toolbar-title>
 
+        <q-input rounded outlined :bg-color="'white'">
+          <template v-slot:append>
+            <q-btn flat rounded icon="search" />
+          </template>
+        </q-input>
+
         <q-toggle
           v-model="darkMode"
           checked-icon="dark_mode"
@@ -42,7 +48,7 @@
     </q-drawer>
 
     <q-page-container>
-      <q-page>
+      <q-page padding>
         <router-view />
       </q-page>
     </q-page-container>
