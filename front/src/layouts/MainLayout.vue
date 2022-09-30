@@ -1,58 +1,60 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+  <div class="q-pa-md">
+    <q-layout view="hHh Lpr lff">
+      <q-header elevated>
+        <q-toolbar>
+          <q-btn
+            flat
+            dense
+            round
+            icon="menu"
+            aria-label="Menu"
+            @click="toggleLeftDrawer"
+          />
 
-        <q-toolbar-title>
-          Pro Deck Builder <br />
-          Yu-gi-oh!
-        </q-toolbar-title>
+          <q-toolbar-title>
+            Pro Deck Builder <br />
+            Yu-gi-oh!
+          </q-toolbar-title>
 
-        <q-input rounded outlined :bg-color="'white'">
-          <template v-slot:append>
-            <q-btn flat rounded icon="search" />
-          </template>
-        </q-input>
+          <q-input rounded outlined :bg-color="'white'">
+            <template v-slot:append>
+              <q-btn flat rounded icon="search" />
+            </template>
+          </q-input>
 
-        <q-toggle
-          v-model="darkMode"
-          checked-icon="dark_mode"
-          unchecked-icon="light_mode"
-          color="dark"
-          size="lg"
-        />
-        <div>
-          <a href="#/login"> Se connecter </a>
-        </div>
-      </q-toolbar>
-    </q-header>
+          <q-toggle
+            v-model="darkMode"
+            checked-icon="dark_mode"
+            unchecked-icon="light_mode"
+            color="dark"
+            size="lg"
+          />
+          <div>
+            <a href="#/login"> Se connecter </a>
+          </div>
+        </q-toolbar>
+      </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+      <q-drawer v-model="leftDrawerOpen" overlay bordered>
+        <q-list>
+          <q-item-label header> Essential Links </q-item-label>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
+          <EssentialLink
+            v-for="link in essentialLinks"
+            :key="link.title"
+            v-bind="link"
+          />
+        </q-list>
+      </q-drawer>
 
-    <q-page-container>
-      <q-page padding>
-        <router-view />
-      </q-page>
-    </q-page-container>
-  </q-layout>
+      <q-page-container>
+        <q-page padding>
+          <router-view />
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </div>
 </template>
 
 <script>
@@ -63,8 +65,15 @@ import { useQuasar } from "quasar";
 const linksList = [
   {
     title: "Home",
-    icon: "home",
     link: "/#/",
+  },
+  {
+    title: "Decks",
+    link: "/#/decks",
+  },
+  {
+    title: "Deck Builder",
+    link: "/#/deck-builder",
   },
 ];
 

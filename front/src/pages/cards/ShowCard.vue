@@ -6,7 +6,7 @@
 
     <div v-else class="q-pa-md q-gutter-sm row justify-center">
       <div style="width: 400px">
-        <q-img :src="card.image?.path" spinner-color="black" />
+        <q-img :src="card.image_path" spinner-color="black" />
       </div>
       <desc-monster-card v-if="card.attribute" :card="card" />
       <desc-spell-card

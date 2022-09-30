@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Card;
-use Illuminate\Http\Client\Request as ClientRequest;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 
 class CardsController extends Controller
 {
@@ -14,7 +13,7 @@ class CardsController extends Controller
      */
     public function index()
     {
-        $cards = Card::with('image_small')->filtered(request()->only('name'))->paginate(10);
+        $cards = Card::with('image_small')->filtered(request()->only('name', 'types', 'attributes', 'races'))->paginate(30)->withQueryString();
         return response()->json($cards, 200);
     }
 
