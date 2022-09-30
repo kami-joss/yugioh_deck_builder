@@ -18,9 +18,14 @@
           v-model="cardTypes.monster.value"
           :label="cardTypes.monster.label"
         />
-        <div v-if="cardTypes.monster.value" :showing="cardTypes.monster.value">
-          <filters-monsters v-model="monstersForm" />
-        </div>
+        <q-slide-transition>
+          <div
+            v-show="cardTypes.monster.value"
+            :showing="cardTypes.monster.value"
+          >
+            <filters-monsters v-model="monstersForm" />
+          </div>
+        </q-slide-transition>
       </div>
 
       <q-separator />
@@ -30,9 +35,11 @@
           v-model="cardTypes.spell.value"
           :label="cardTypes.spell.label"
         />
-        <div v-if="cardTypes.spell.value">
-          <filters-spells v-model="spellsForm" />
-        </div>
+        <q-slide-transition>
+          <div v-show="cardTypes.spell.value">
+            <filters-spells v-model="spellsForm" />
+          </div>
+        </q-slide-transition>
       </div>
 
       <q-separator />
@@ -42,9 +49,11 @@
           v-model="cardTypes.trap.value"
           :label="cardTypes.trap.label"
         />
-        <div v-if="cardTypes.trap.value">
-          <filters-traps v-model="trapsForm" />
-        </div>
+        <q-slide-transition>
+          <div v-show="cardTypes.trap.value">
+            <filters-traps v-model="trapsForm" />
+          </div>
+        </q-slide-transition>
       </div>
     </div>
 

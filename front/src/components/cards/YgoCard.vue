@@ -1,17 +1,19 @@
 <template>
-  <div class="column items-center ygo-card" @click="redirect">
+  <div class="column items-center ygo-card" @click="handleClick">
     <div style="width: 120px">
       <q-img :src="card.image_path" spinner-color="black" />
     </div>
-    <q-separator spaced dark />
-    <p class="text-center">
-      {{ card.name }}
-    </p>
+    <div v-if="label">
+      <q-separator spaced dark />
+      <p class="text-center">
+        {{ card.name }}
+      </p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
+import { defineEmits, defineProps } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -21,10 +23,23 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  label: {
+    type: String,
+    default: null,
+  },
+  clickable: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const redirect = () => {
-  router.push(`/card/${props.card.id}`);
+const emits = defineEmits(["click"]);
+
+const handleClick = () => {
+  if (props.clickable) {
+    emits("click", props.card);
+  }
+  // router.push(`/card/${props.card.id}`);
 };
 </script>
 
