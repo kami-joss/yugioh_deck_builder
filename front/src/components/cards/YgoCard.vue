@@ -1,5 +1,5 @@
 <template>
-  <div class="column items-center ygo-card" @click="handleClick">
+  <div class="ygo-card" @click="handleClick">
     <div style="width: 120px">
       <q-img :src="card.image_path" spinner-color="black" />
     </div>
@@ -46,5 +46,6 @@ const handleClick = () => {
 <style scoped>
 .ygo-card {
   cursor: pointer;
+  max-height: 200px;
 }
 </style>

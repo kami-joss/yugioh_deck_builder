@@ -1,44 +1,21 @@
 <template>
   <div>
     <div class="row index-row">
-      <div class="col-12 col-lg row inline deckbox">
-        <ygo-card
-          v-for="card in deck"
-          :key="card.id"
-          :card="card"
-          :clickable="true"
-          @click="removeCardFromDeck"
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-2 col"
-        />
-      </div>
+      <deck-list
+        :deck="deck"
+        class="col-12 col-lg-4"
+        @remove="removeCardFromDeck"
+        @add="addCardToDeck"
+      />
+      <cards-list
+        :cards="cards.data"
+        class="col-12 col-lg-5"
+        @click="addCardToDeck"
+        @load="onLoad"
+      />
+      <filters-cards class="col" @search="onSearch" />
 
-      <div class="col-12 col-lg cardsList-container" ref="scrollTargetRef">
-        <q-infinite-scroll
-          @load="onLoad"
-          :offset="250"
-          :scroll-target="scrollTargetRef"
-        >
-          <div class="row inline justify-center cardsList-grid">
-            <ygo-card
-              v-for="card in cards"
-              :key="card.id"
-              :card="card"
-              :clickable="true"
-              @click="addCardToDeck"
-              class="col-xs-12 col-sm-6 col-md-4 col-lg-2 col"
-            />
-          </div>
-          <template v-slot:loading>
-            <div class="row justify-center q-my-md">
-              <q-spinner-dots color="primary" size="40px" />
-            </div>
-          </template>
-        </q-infinite-scroll>
-      </div>
-
-      <div class="col-lg-3">
-        <filters-cards @search="onSearch" />
-      </div>
+      <div class=""></div>
     </div>
   </div>
 </template>
@@ -51,6 +28,8 @@ import { useQuasar } from "quasar";
 
 import FiltersCards from "src/components/forms/filters/FiltersCards.vue";
 import YgoCard from "src/components/cards/YgoCard.vue";
+import CardsList from "src/components/cards/CardsList.vue";
+import DeckList from "src/components/cards/DeckList.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -62,7 +41,7 @@ const cards = ref([]);
 
 const deck = ref([]);
 
-const getCards = async (params) => {
+const getCards = async (params, load) => {
   const queryParams = route.query;
   await api
     .get("/cards", {
@@ -72,8 +51,11 @@ const getCards = async (params) => {
       },
     })
     .then((res) => {
-      console.log(res.data.data);
-      cards.value = cards.value.concat(res.data.data);
+      if (load) {
+        cards.value.data = [...cards.value.data, ...res.data.data];
+      } else {
+        cards.value = res.data;
+      }
     })
     .catch((err) => {
       console.error(err);
@@ -115,15 +97,19 @@ watch(
 );
 
 const onLoad = (index, done) => {
+  if (current_page.value > cards.value.last_page) {
+    done();
+    return;
+  }
   setTimeout(() => {
     current_page.value++;
-    getCards({ page: current_page.value });
+    getCards({ page: current_page.value }, true);
     done();
   }, 2000);
 };
 
 const onSearch = (form) => {
-  console.log(form);
+  current_page.value = 1;
   router.push({
     query: {
       ...route.query,
@@ -139,26 +125,9 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .index-row {
-  gap: 3rem;
+  gap: 1rem;
   @media (max-width: $breakpoint-md) {
     flex-direction: column-reverse;
   }
-}
-
-.deckbox {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 1rem;
-  gap: 1rem;
-  max-height: 100vh;
-}
-
-.cardsList-grid {
-  gap: 1rem;
-}
-
-.cardsList-container {
-  max-height: 100vh;
-  overflow: auto;
 }
 </style>

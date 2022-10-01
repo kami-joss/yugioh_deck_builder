@@ -1,5 +1,5 @@
 <template>
-  <q-card class="q-px-md q-py-md">
+  <q-card class="q-px-md q-py-md filters-container">
     <q-input
       v-model="monstersForm.name"
       rounded
@@ -98,9 +98,9 @@ const cardTypes = reactive({
 
 const onSearch = () => {
   const form = {
-    ...monstersForm,
-    ...spellsForm,
-    ...trapsForm,
+    ...monstersForm.value,
+    ...spellsForm.value,
+    ...trapsForm.value,
     races: monstersForm.value.races.concat(
       spellsForm.value.races,
       trapsForm.value.races
@@ -134,46 +134,11 @@ watch(
     onSearch();
   }
 );
-
-// watch(
-//   () => cardTypes.monster.value,
-//   (val) => {
-//     let monsterTypesVal = monsterTypes.map((type) => type.value);
-//     if (!val) {
-//       form.value.types = form.value.types.filter(
-//         (type) => !monsterTypesVal.includes(type)
-//       );
-//     } else {
-//       form.value.types = form.value.types.concat(monsterTypesVal);
-//     }
-//   }
-// );
-
-// watch(
-//   () => cardTypes.spell.value,
-//   (val) => {
-//     let spellRacesVal = spellRaces.map((type) => type.value);
-//     if (!val) {
-//       form.value.types = form.value.types.filter(
-//         (type) => !spellRacesVal.includes(type)
-//       );
-//     } else {
-//       form.value.types = form.value.types.concat(spellRacesVal);
-//     }
-//   }
-// );
-
-// watch(
-//   () => cardTypes.trap.value,
-//   (val) => {
-//     let trapRacesVal = trapRaces.map((type) => type.value);
-//     if (!val) {
-//       form.value.types = form.value.types.filter(
-//         (type) => !trapRacesVal.includes(type)
-//       );
-//     } else {
-//       form.value.types = form.value.types.concat(trapRacesVal);
-//     }
-//   }
-// );
 </script>
+
+<style scoped lang="scss">
+.filters-container {
+  max-height: 90vh;
+  overflow: auto;
+}
+</style>
