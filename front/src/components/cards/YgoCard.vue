@@ -1,6 +1,6 @@
 <template>
-  <div class="ygo-card" @click="handleClick">
-    <div style="width: 120px">
+  <div class="ygo-card" @click="handleClick" @mouseover="handleHover">
+    <div style="width: 100%">
       <q-img :src="card.image_path" spinner-color="black" />
     </div>
     <div v-if="label">
@@ -33,13 +33,16 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(["click"]);
+const emits = defineEmits(["click", "hover:card"]);
 
 const handleClick = () => {
   if (props.clickable) {
     emits("click", props.card);
   }
   // router.push(`/card/${props.card.id}`);
+};
+const handleHover = () => {
+  emits("hover:card", props.card);
 };
 </script>
 

@@ -139,6 +139,7 @@ watch(
 <style scoped lang="scss">
 .filters-container {
   max-height: 90vh;
+  height: max-content;
   overflow: auto;
 }
 </style>

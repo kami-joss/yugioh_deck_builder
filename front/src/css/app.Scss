@@ -21,6 +21,12 @@ $lg-breakpoint: 1920px;
   .container-sm {
     max-width: 540px;
   }
+  .hidden-xs {
+    display: none;
+  }
+  .block-xs {
+    display: block;
+  }
 }
 
 @media (min-width: $sm-breakpoint) {
@@ -28,6 +34,12 @@ $lg-breakpoint: 1920px;
   .container-sm,
   .container-md {
     max-width: 920px;
+  }
+  .hidden-sm {
+    display: none;
+  }
+  .block-sm {
+    display: block;
   }
 }
 
@@ -37,6 +49,12 @@ $lg-breakpoint: 1920px;
   .container-md,
   .container-lg {
     max-width: 1140px;
+  }
+  .hidden-md {
+    display: none;
+  }
+  .block-md {
+    display: block;
   }
 }
 
@@ -48,10 +66,45 @@ $lg-breakpoint: 1920px;
   .container-xl {
     max-width: 1440px;
   }
+  .hidden-lg {
+    display: none;
+  }
+  .block-lg {
+    display: block;
+  }
 }
 
 a {
   color: #100b0f;
   text-decoration: none;
   background-color: transparent;
+}
+
+.card-desc {
+  width: 100%;
+  max-width: 350px;
+}
+
+.card-desc_section {
+  padding: 10px;
+}
+
+a {
+  color: #100b0f;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.index-card:hover {
+  box-shadow: 5px 5px 5px 5px #b3b3b3;
+  border: solid 1px #b3b3b3;
+  transition-duration: 0.25s;
+}
+
+.gap-1 {
+  gap: 1rem;
+}
+
+.gap-2 {
+  gap: 2rem;
 }

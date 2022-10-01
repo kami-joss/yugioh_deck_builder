@@ -1,18 +1,15 @@
 <template>
-  <q-card class="cardsList-container" ref="scrollTargetRef">
-    <q-infinite-scroll
-      @load="onLoad"
-      :offset="250"
-      :scroll-target="scrollTargetRef"
-    >
-      <div class="row justify-center cardsList-grid">
+  <q-card class="cardsList-container column">
+    <q-infinite-scroll @load="onLoad">
+      <div class="row cardsList-grid">
         <ygo-card
           v-for="card in cards"
           :key="card.id"
           :card="card"
           :clickable="true"
           @click="emits('click', card)"
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-2 col"
+          @hover:card="emits('hover:card', card)"
+          class="col-2"
         />
       </div>
       <template v-slot:loading>
@@ -29,8 +26,6 @@ import { onMounted, reactive, ref, watch, defineEmits, defineProps } from "vue";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
 
-const scrollTargetRef = ref(null);
-
 const props = defineProps({
   cards: {
     type: Array,
@@ -39,28 +34,19 @@ const props = defineProps({
 });
 
 const onLoad = (index, done) => {
-  emits("load", index, done);
+  emits("load:scroll", index, done);
 };
 
-const emits = defineEmits(["click", "load"]);
-
-const state = reactive({
-  cards: {
-    data: [],
-    meta: {},
-  },
-  page: 1,
-  search: "",
-});
+const emits = defineEmits(["click", "load:scroll", "hover:card"]);
 </script>
 
 <style scoped lang="scss">
 .cardsList-container {
-  max-height: 90vh;
+  height: 80vh;
   overflow: auto;
 }
 
 .cardsList-grid {
-  gap: 1rem;
+  gap: 0.3rem;
 }
 </style>
