@@ -1,6 +1,14 @@
 <template>
-  <q-card class="cardsList-container column">
-    <q-infinite-scroll @load="onLoad">
+  <div
+    id="scroll-target-id"
+    class="cardsList-container column"
+    :ref="scrollTargetRef"
+  >
+    <q-infinite-scroll
+      @load="onLoad"
+      scroll-target="#scroll-target-id"
+      :offset="250"
+    >
       <div class="row cardsList-grid">
         <ygo-card
           v-for="card in cards"
@@ -18,13 +26,14 @@
         </div>
       </template>
     </q-infinite-scroll>
-  </q-card>
+  </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch, defineEmits, defineProps } from "vue";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
+const scrollTargetRef = ref(null);
 
 const props = defineProps({
   cards: {
@@ -34,6 +43,7 @@ const props = defineProps({
 });
 
 const onLoad = (index, done) => {
+  console.log("onLoad", index);
   emits("load:scroll", index, done);
 };
 
@@ -47,6 +57,7 @@ const emits = defineEmits(["click", "load:scroll", "hover:card"]);
 }
 
 .cardsList-grid {
+  // overflow: auto;
   gap: 0.3rem;
 }
 </style>

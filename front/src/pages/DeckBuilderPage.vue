@@ -149,7 +149,7 @@ const tab = ref("card");
 const modalFilters = ref(false);
 const modalCard = ref(false);
 
-const getCards = async (params, load) => {
+const getCards = async (params, load, done) => {
   const queryParams = route.query;
   await api
     .get("/cards", {
