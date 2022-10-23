@@ -1,16 +1,15 @@
 <template>
   <div>
-    <div>
+    <div class="header">
       <q-btn
         label="Save"
-        icon="add"
+        icon="save"
         size="md"
         color="primary"
         @click="modalSaveDeck = true"
       />
       <q-btn
         label="Reset"
-        icon="add"
         size="md"
         color="primary"
         @click="modalWarnReset = true"
@@ -148,13 +147,16 @@
       @add:card="addCardToDeck"
     />
 
-    <modal-name v-model="modalSaveDeck" @save="saveDeck" />
+    <modal-save-deck v-model="modalSaveDeck" @save="saveDeck" />
 
     <modal-confirm
       v-model="modalWarnReset"
+      text="Are-you sure to want reset this deck ?"
       @confirm="resetAll"
       @cancel="modalWarnReset = false"
     />
+
+    <modal-spinner v-model="waitingApi" />
   </div>
 </template>
 
@@ -170,10 +172,11 @@ import CardsList from "src/components/cards/CardsList.vue";
 import DeckList from "src/components/cards/DeckList.vue";
 import FullYgoCard from "src/components/cards/FullYgoCard.vue";
 import ModalYgoCard from "src/components/modals/ModalYgoCard.vue";
-import ModalName from "src/components/modals/ModalName.vue";
+import ModalSaveDeck from "src/components/modals/ModalSaveDeck.vue";
 import ModalConfirm from "src/components/modals/ModalConfirm.vue";
 
 import { isExtraDeck } from "src/utils/cardUtils";
+import ModalSpinner from "src/components/modals/ModalSpinner.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -187,14 +190,41 @@ const deck = reactive({
   side: [],
 });
 const cardShowing = ref(null);
-const tab = ref("cardList");
+const tab = ref("card");
 
 const modalFilters = ref(false);
 const modalCard = ref(false);
 
 const modalSaveDeck = ref(false);
-const saveDeck = (name) => {
-  console.log(name);
+
+const waitingApi = ref(false);
+
+const saveDeck = (deckOptions) => {
+  waitingApi.value = true;
+  const cards = [
+    ...deck.main.map((card) => card.id),
+    ...deck.extra.map((card) => card.id),
+    ...deck.side.map((card) => card.id),
+  ];
+  console.log(deckOptions, cards);
+  api
+    .post("/decks", {
+      ...deckOptions,
+      cards,
+      public: deckOptions.isPublic,
+      user_id: 1,
+    })
+    .then((res) => {
+      waitingApi.value = false;
+    })
+    .catch((err) => {
+      waitingApi.value = false;
+      $q.notify({
+        message: "An error occured. Please try again later.",
+        color: "negative",
+        position: "top",
+      });
+    });
 };
 
 const modalWarnReset = ref(false);
@@ -402,5 +432,12 @@ watch(
   @media (max-width: $breakpoint-md) {
     display: none;
   }
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin: 1rem;
 }
 </style>

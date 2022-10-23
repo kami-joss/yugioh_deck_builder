@@ -12,7 +12,7 @@
           :card="card"
           :clickable="true"
           :cardSelected="cardSelected"
-          class="col-3 col-md-2"
+          class="col-3 col-md-2 cardSelected"
           @click="emits('click:card', { card, quantity: 1 })"
           @hover:card="emits('hover:card', card)"
         />
@@ -71,5 +71,11 @@ const onLoad = (index, done) => {
   }
   justify-content: center;
   gap: 0.3rem;
+}
+.cardSelected {
+  border: solid 3px;
+}
+.cardSelected:hover {
+  border-color: blueviolet;
 }
 </style>

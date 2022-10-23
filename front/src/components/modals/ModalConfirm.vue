@@ -2,8 +2,8 @@
   <q-dialog v-model="state" persistent>
     <q-card>
       <q-card-section class="row items-center">
-        <q-avatar :icon="icon" color="primary" text-color="white" />
-        <span class="q-ml-sm"> {{ text }}.</span>
+        <q-avatar :icon="icon" color="orange-4" text-color="white" />
+        <span class="q-ml-sm"> {{ text }}</span>
       </q-card-section>
 
       <q-card-actions align="right">

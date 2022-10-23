@@ -11,17 +11,30 @@
         />
         <q-input
           v-model="form.name"
+          ref="nameRef"
+          placeholder="Enter a name"
           class="input-text"
           style="width: 400px"
-          placeholder="Enter a name"
+          lazy-rules
+          :rules="[(val) => !!val || 'Name is required']"
         />
-        <q-btn
-          label="Save"
-          icon="save"
-          size="md"
-          color="primary"
-          @click="emits('save', form.name)"
+        <q-input
+          v-model="form.description"
+          filled
+          style="width: 400px"
+          type="textarea"
+          placeholder="Enter a description"
         />
+        <q-checkbox v-model="form.isPublic" label="Public" color="teal" />
+        <div class="row gap-1">
+          <q-btn
+            label="Save"
+            icon="save"
+            size="md"
+            color="primary"
+            @click="onSave"
+          />
+        </div>
       </q-card>
     </q-dialog>
   </div>
@@ -41,7 +54,20 @@ const state = ref(props.modelValue);
 
 const form = reactive({
   name: "",
+  description: "",
+  isPublic: false,
 });
+
+const nameRef = ref(null);
+
+const onSave = () => {
+  nameRef.value.validate();
+
+  if (nameRef.value.hasError) return;
+
+  emits("save", form);
+  state.value = false;
+};
 
 const emits = defineEmits(["save"]);
 

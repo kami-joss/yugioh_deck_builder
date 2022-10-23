@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CardsController;
+use App\Http\Controllers\DecksController;
 use App\Http\Controllers\UsersController;
 
 /*
@@ -37,4 +38,9 @@ Route::prefix('/cards')->group(function () {
     Route::put('/{card}', [CardsController::class, 'update']);
 
     Route::delete('/{card}', [CardsController::class, 'destroy']);
+});
+
+
+Route::prefix('/decks')->group(function() {
+    route::post('/', [DecksController::class, 'store']);
 });
