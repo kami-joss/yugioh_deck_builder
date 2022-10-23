@@ -1,6 +1,6 @@
 <template>
   <div class="ygo-card" @click="handleClick" @mouseover="handleHover">
-    <div style="width: 100%">
+    <div style="width: 100%; position: relative">
       <q-img :src="card.image_path" spinner-color="black" />
     </div>
     <div v-if="label">
@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from "vue";
+import { defineEmits, defineProps, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -31,9 +31,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  cardSelected: {
+    type: Object,
+    default: null,
+  },
 });
 
-const emits = defineEmits(["click", "hover:card"]);
+const emits = defineEmits(["click", "hover:card", "add"]);
+const options = ref(false);
 
 const handleClick = () => {
   if (props.clickable) {
@@ -44,6 +49,15 @@ const handleClick = () => {
 const handleHover = () => {
   emits("hover:card", props.card);
 };
+
+watch(
+  () => props.cardSelected,
+  (carte) => {
+    carte.id == props.card.id
+      ? (options.value = true)
+      : (options.value = false);
+  }
+);
 </script>
 
 <style scoped>

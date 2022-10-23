@@ -1,16 +1,46 @@
 <template>
   <div>
-    <div class="row index-row gt-md">
-      <deck-list
-        :deck="deck"
-        class="col-12 col-lg-4"
-        @remove="removeCardFromDeck"
-        @add="addCardToDeck"
+    <div>
+      <q-btn
+        label="Save"
+        icon="add"
+        size="md"
+        color="primary"
+        @click="modalSaveDeck = true"
       />
+      <q-btn
+        label="Reset"
+        icon="add"
+        size="md"
+        color="primary"
+        @click="modalWarnReset = true"
+      />
+    </div>
+    <div v-if="$q.platform.is.desktop" class="row index-row">
+      <div class="col-5 deck-container">
+        <div class="row justify-between">
+          <p class="text-h6">Main Deck</p>
+          <p class="text-h6">{{ deck.main.length }}</p>
+        </div>
+        <deck-list
+          :deck="deck.main"
+          class="main-deck"
+          @remove="removeCardFromDeck"
+        />
+        <div class="row justify-between">
+          <p class="text-h6">Extra Deck</p>
+          <p class="text-h6">{{ deck.extra.length }}</p>
+        </div>
+        <deck-list
+          :deck="deck.extra"
+          class="extra-deck"
+          @remove="removeCardFromDeck"
+        />
+      </div>
       <cards-list
         :cards="cards.data"
-        class="col-12 col-lg-4"
-        @click="addCardToDeck"
+        class="col-4"
+        @click:card="addCardToDeck"
         @load:scroll="onLoad"
         @hover:card="setCardShowing"
       />
@@ -48,7 +78,7 @@
 
     <!-- View on mobile -->
 
-    <div class="column col gap-1 lt-md">
+    <div v-if="$q.platform.is.mobile" class="column col gap-1 lt-md">
       <q-tabs
         v-model="tab"
         dense
@@ -68,14 +98,19 @@
           <cards-list
             :cards="cards.data"
             class="col-12 col-lg-4"
-            @click="addCardToDeck"
-            @load="onLoad"
-            @hover:card="setCardShowing"
+            @load:scroll="onLoad"
+            @click:card="setCardShowing"
           />
         </q-tab-panel>
         <q-tab-panel name="deck">
           <deck-list
-            :deck="deck"
+            :deck="deck.main"
+            class="col-12 col-lg-4"
+            @remove="removeCardFromDeck"
+            @add="addCardToDeck"
+          />
+          <deck-list
+            :deck="deck.extra"
             class="col-12 col-lg-4"
             @remove="removeCardFromDeck"
             @add="addCardToDeck"
@@ -96,23 +131,6 @@
       <filters-cards @search="onSearch" />
     </q-dialog>
 
-    <q-dialog v-model="modalCard">
-      <q-btn
-        round
-        size="md"
-        color="red-5"
-        icon="close"
-        class="lt-md btn-filter-close"
-        @click="modalCard = false"
-      />
-      <full-ygo-card
-        v-if="cardShowing"
-        :card="cardShowing"
-        :key="cardShowing.id"
-        class="z-10"
-      />
-    </q-dialog>
-
     <q-btn
       v-show="!modalFilters"
       round
@@ -121,6 +139,21 @@
       icon="tune"
       class="lt-md btn-filter"
       @click="modalFilters = true"
+    />
+
+    <!-- Modales -->
+    <modal-ygo-card
+      v-model="modalCard"
+      :card="cardShowing"
+      @add:card="addCardToDeck"
+    />
+
+    <modal-name v-model="modalSaveDeck" @save="saveDeck" />
+
+    <modal-confirm
+      v-model="modalWarnReset"
+      @confirm="resetAll"
+      @cancel="modalWarnReset = false"
     />
   </div>
 </template>
@@ -136,6 +169,11 @@ import YgoCard from "src/components/cards/YgoCard.vue";
 import CardsList from "src/components/cards/CardsList.vue";
 import DeckList from "src/components/cards/DeckList.vue";
 import FullYgoCard from "src/components/cards/FullYgoCard.vue";
+import ModalYgoCard from "src/components/modals/ModalYgoCard.vue";
+import ModalName from "src/components/modals/ModalName.vue";
+import ModalConfirm from "src/components/modals/ModalConfirm.vue";
+
+import { isExtraDeck } from "src/utils/cardUtils";
 
 const router = useRouter();
 const route = useRoute();
@@ -143,11 +181,28 @@ const $q = useQuasar();
 
 const current_page = ref(1);
 const cards = ref([]);
-const deck = ref([]);
+const deck = reactive({
+  main: [],
+  extra: [],
+  side: [],
+});
 const cardShowing = ref(null);
-const tab = ref("card");
+const tab = ref("cardList");
+
 const modalFilters = ref(false);
 const modalCard = ref(false);
+
+const modalSaveDeck = ref(false);
+const saveDeck = (name) => {
+  console.log(name);
+};
+
+const modalWarnReset = ref(false);
+const resetAll = () => {
+  deck.main = [];
+  deck.extra = [];
+  deck.side = [];
+};
 
 const getCards = async (params, load, done) => {
   const queryParams = route.query;
@@ -170,35 +225,102 @@ const getCards = async (params, load, done) => {
     });
 };
 
-const addCardToDeck = (card) => {
-  let cardExists = 0;
-
-  deck.value.forEach((deckCard) => {
-    if (deckCard.id === card.id) {
-      cardExists++;
-    }
-  });
-
-  if (cardExists === 3) {
-    $q.notify({
-      message: "You can't have more than 3 of the same card in your deck",
-      color: "amber-6",
-      position: "top",
-      icon: "warning",
+const countCopyInDeck = (card) => {
+  let count = 0;
+  if (isExtraDeck(card.type)) {
+    deck.extra.forEach((deckCard) => {
+      if (deckCard.id === card.id) {
+        count++;
+      }
     });
-    return;
+  } else {
+    deck.main.forEach((deckCard) => {
+      if (deckCard.id === card.id) {
+        count++;
+      }
+    });
   }
 
-  deck.value.push(card);
+  return count;
+};
+
+const canAddToDeck = (card) => {
+  const main = deck.main.length;
+  const extra = deck.extra.length;
+  const side = deck.side.length;
+
+  if (main + 1 > 60 && !isExtraDeck(card.type)) {
+    $q.notify({
+      message: "You can't have more than 60 cards in your main deck",
+      color: "negative",
+      position: "top",
+    });
+    return false;
+  }
+
+  if (extra + 1 > 15 && isExtraDeck(card.type)) {
+    $q.notify({
+      message: "You can't have more than 15 cards in your extra deck",
+      color: "negative",
+      position: "top",
+    });
+    return false;
+  }
+
+  if (side + 1 > 15) {
+    $q.notify({
+      message: "You can't have more than 15 cards in your side deck",
+      color: "negative",
+      position: "top",
+    });
+    return false;
+  }
+
+  return true;
+};
+
+const addCardToDeck = ({ card, quantity }) => {
+  const copies = countCopyInDeck(card);
+
+  if (quantity && canAddToDeck(card)) {
+    if (quantity + copies > 3) {
+      $q.notify({
+        message: `You can't have more than 3 of the same card in your deck. Number in deck: ${copies}`,
+        color: "amber-6",
+        position: "top",
+        icon: "warning",
+      });
+    } else {
+      if (isExtraDeck(card.type)) {
+        for (let i = 0; i < quantity; i++) {
+          deck.extra.push(card);
+        }
+      } else {
+        for (let i = 0; i < quantity; i++) {
+          deck.main.push(card);
+        }
+      }
+    }
+    return;
+  }
 };
 
 const setCardShowing = (card) => {
   cardShowing.value = card;
+
+  if ($q.platform.is.mobile) {
+    modalCard.value = true;
+  }
 };
 
 const removeCardFromDeck = (card) => {
-  let index = deck.value.indexOf(deck.value.find((c) => c.id === card.id));
-  deck.value.splice(index, 1);
+  if (isExtraDeck(card.type)) {
+    let index = deck.extra.indexOf(deck.extra.find((c) => c.id === card.id));
+    deck.extra.splice(index, 1);
+  } else {
+    let index = deck.main.indexOf(deck.main.find((c) => c.id === card.id));
+    deck.main.splice(index, 1);
+  }
 };
 
 const onLoad = (index, done) => {
@@ -238,7 +360,7 @@ watch(
 
 <style scoped lang="scss">
 .index-row {
-  gap: 1rem;
+  justify-content: space-between;
   @media (max-width: $breakpoint-md) {
     flex-direction: column-reverse;
   }
@@ -256,5 +378,29 @@ watch(
   top: 1rem;
   right: 1rem;
   z-index: 100;
+}
+
+.deck-container {
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-deck {
+  max-height: 50%;
+  overflow-y: auto;
+}
+
+.extra-deck {
+  max-height: 25%;
+  overflow-y: auto;
+}
+
+.custom {
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
 }
 </style>

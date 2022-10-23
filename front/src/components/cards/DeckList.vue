@@ -7,7 +7,7 @@
         :card="card"
         :clickable="true"
         @click="removeCardFromDeck"
-        class="col-2"
+        class="col-1"
       />
     </div>
   </q-card>
@@ -37,7 +37,6 @@ const emits = defineEmits(["remove", "add"]);
 
 <style scoped lang="scss">
 .deckList-container {
-  height: 80vh;
   overflow: auto;
 }
 

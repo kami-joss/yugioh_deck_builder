@@ -1,9 +1,5 @@
 <template>
-  <div
-    id="scroll-target-id"
-    class="cardsList-container column"
-    :ref="scrollTargetRef"
-  >
+  <q-card id="scroll-target-id" class="cardsList-container column">
     <q-infinite-scroll
       @load="onLoad"
       scroll-target="#scroll-target-id"
@@ -15,25 +11,29 @@
           :key="card.id"
           :card="card"
           :clickable="true"
-          @click="emits('click', card)"
+          :cardSelected="cardSelected"
+          class="col-3 col-md-2"
+          @click="emits('click:card', { card, quantity: 1 })"
           @hover:card="emits('hover:card', card)"
-          class="col-2"
         />
       </div>
       <template v-slot:loading>
         <div class="row justify-center q-my-md">
-          <q-spinner-dots color="primary" size="40px" />
+          <q-spinner-dots color="amber-6" size="40px" />
         </div>
       </template>
     </q-infinite-scroll>
-  </div>
+  </q-card>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch, defineEmits, defineProps } from "vue";
+import { useQuasar, Platform } from "quasar";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
-const scrollTargetRef = ref(null);
+
+const $q = useQuasar();
+const cardSelected = ref(null);
 
 const props = defineProps({
   cards: {
@@ -42,22 +42,34 @@ const props = defineProps({
   },
 });
 
+const emits = defineEmits([
+  "click:card",
+  "hover:card",
+  "click:add",
+  "load:scroll",
+]);
+
 const onLoad = (index, done) => {
   console.log("onLoad", index);
   emits("load:scroll", index, done);
 };
-
-const emits = defineEmits(["click", "load:scroll", "hover:card"]);
 </script>
 
 <style scoped lang="scss">
 .cardsList-container {
-  height: 80vh;
+  height: 90vh;
   overflow: auto;
+  @media (max-width: $breakpoint-md) {
+    height: 90vh;
+    width: 100%;
+  }
 }
 
 .cardsList-grid {
-  // overflow: auto;
+  @media (max-width: $breakpoint-md) {
+    justify-content: space-around;
+  }
+  justify-content: center;
   gap: 0.3rem;
 }
 </style>
