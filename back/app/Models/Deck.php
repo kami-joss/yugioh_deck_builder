@@ -37,4 +37,9 @@ class Deck extends Model
     {
         return $this->belongsToMany(Card::class, 'decks_cards');
     }
+
+    public function scopePublic($query)
+    {
+        return $query->where('public', true);
+    }
 }

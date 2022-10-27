@@ -12,6 +12,14 @@ const routes = [
         path: "/deck-builder",
         component: () => import("pages/DeckBuilderPage.vue"),
       },
+      {
+        path: "/decks",
+        component: () => import("pages/decks/DecksIndexPage.vue"),
+      },
+      {
+        path: "/decks/:id",
+        component: () => import("pages/decks/DeckViewPage.vue"),
+      },
     ],
   },
   {

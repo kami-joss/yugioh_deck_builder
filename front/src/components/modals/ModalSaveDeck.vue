@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <q-dialog v-model="state" class="modal">
-      <q-card class="modal-container">
+      <q-card class="modal-container" style="max-width: 400px; width: 100%">
         <q-btn
           round
           size="md"
@@ -14,14 +14,14 @@
           ref="nameRef"
           placeholder="Enter a name"
           class="input-text"
-          style="width: 400px"
+          style="width: 100%"
           lazy-rules
           :rules="[(val) => !!val || 'Name is required']"
         />
         <q-input
           v-model="form.description"
           filled
-          style="width: 400px"
+          style="width: 100%"
           type="textarea"
           placeholder="Enter a description"
         />

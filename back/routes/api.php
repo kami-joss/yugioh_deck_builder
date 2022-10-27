@@ -41,6 +41,13 @@ Route::prefix('/cards')->group(function () {
 });
 
 
-Route::prefix('/decks')->group(function() {
+Route::prefix('/decks')->group(function () {
+    route::get('/', [DecksController::class, 'index']);
+    route::get('/{deck}', [DecksController::class, 'show']);
+
     route::post('/', [DecksController::class, 'store']);
+
+    route::put('/{deck}', [DecksController::class, 'update']);
+
+    route::delete('/{deck}', [DecksController::class, 'delete']);
 });

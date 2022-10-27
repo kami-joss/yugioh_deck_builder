@@ -206,7 +206,6 @@ const saveDeck = (deckOptions) => {
     ...deck.extra.map((card) => card.id),
     ...deck.side.map((card) => card.id),
   ];
-  console.log(deckOptions, cards);
   api
     .post("/decks", {
       ...deckOptions,
@@ -216,6 +215,12 @@ const saveDeck = (deckOptions) => {
     })
     .then((res) => {
       waitingApi.value = false;
+      $q.notify({
+        message: "Deck saved",
+        color: "positive",
+        position: "top",
+        icon: "check",
+      });
     })
     .catch((err) => {
       waitingApi.value = false;

@@ -6,17 +6,23 @@
         :key="card.id"
         :card="card"
         :clickable="true"
-        @click="removeCardFromDeck"
         class="col-1"
+        @click="removeCardFromDeck"
+        @hover:card="setCardStore"
       />
     </div>
   </q-card>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch, defineProps, defineEmits } from "vue";
-
+import { defineProps, defineEmits } from "vue";
+import { useCardStore } from "src/stores/card";
 import YgoCard from "src/components/cards/YgoCard.vue";
+
+const store = useCardStore();
+const setCardStore = (card) => {
+  store.$patch({ card: card });
+};
 
 const props = defineProps({
   deck: {

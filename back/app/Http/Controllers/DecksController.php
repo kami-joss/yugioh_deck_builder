@@ -8,9 +8,27 @@ use Illuminate\Http\Request;
 class DecksController extends Controller
 {
     //
+
+    public function index()
+    {
+        $decks = Deck::public()->with('user:id,name')->paginate();
+        return response()->json($decks, 201);
+    }
+
+    public function show(Deck $deck)
+    {
+        $deck->load('user:id,name', 'cards', 'cards.image');
+        return response()->json($deck, 201);
+    }
+
     public function store()
     {
         $this->handle();
+    }
+
+    public function update(Request $request, Deck $deck)
+    {
+        $this->handle($deck);
     }
 
     public function handle(Deck $deck = null)
@@ -34,4 +52,11 @@ class DecksController extends Controller
             $deck->cards()->sync(request()->cards);
         }
     }
+
+    public function delete(Deck $deck)
+    {
+        $deck->delete();
+        return response()->json(null, 204);
+    }
+
 }
