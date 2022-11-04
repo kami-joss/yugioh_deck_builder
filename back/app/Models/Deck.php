@@ -58,9 +58,11 @@ class Deck extends Model
             }
         });
 
-        $query->when($filters['illegal'] == 'false', function ($query) {
-            $query->where('illegal', false);
-        });
+        if (isset($filters['illegal'])) {
+            if ($filters['illegal'] == 'false') {
+                $query->where('illegal', $filters['illegal']);
+            }
+        }
 
         return $query;
     }

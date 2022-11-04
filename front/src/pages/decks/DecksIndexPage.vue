@@ -86,6 +86,7 @@ const filters = ref({
   searchBy: "Name",
   illegal: true,
 });
+
 watch(
   () => filters.value.search,
   async (val) => {
