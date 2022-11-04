@@ -6,7 +6,19 @@ const routes = [
       { path: "", component: () => import("pages/IndexPage.vue") },
       {
         path: "/card/:id",
-        component: () => import("pages/cards/showCard.vue"),
+        component: () => import("pages/cards/ShowCard.vue"),
+      },
+      {
+        path: "/deck-builder",
+        component: () => import("pages/DeckBuilderPage.vue"),
+      },
+      {
+        path: "/decks",
+        component: () => import("pages/decks/DecksIndexPage.vue"),
+      },
+      {
+        path: "/decks/:id",
+        component: () => import("pages/decks/DeckViewPage.vue"),
       },
     ],
   },

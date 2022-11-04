@@ -213,4 +213,22 @@ const trapRaces = [
   },
 ];
 
-export { monsterAttributes, monsterTypes, monsterRaces, spellRaces, trapRaces };
+const isExtraDeck = (type) => {
+  const typeLower = type.toLowerCase();
+  return (
+    typeLower.includes("xyz") ||
+    typeLower.includes("synchro") ||
+    typeLower.includes("link") ||
+    typeLower.includes("pendulum") ||
+    typeLower.includes("fusion")
+  );
+};
+
+export {
+  monsterAttributes,
+  monsterTypes,
+  monsterRaces,
+  spellRaces,
+  trapRaces,
+  isExtraDeck,
+};
