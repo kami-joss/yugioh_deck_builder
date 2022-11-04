@@ -42,4 +42,26 @@ class Deck extends Model
     {
         return $query->where('public', true);
     }
+
+    public function scopeFiltered($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) use ($filters) {
+            switch ($filters['searchBy']) {
+                case 'Author':
+                    $query->whereHas('user', function ($query) use ($search) {
+                        $query->where('name', 'like', $search . '%');
+                    });
+                    break;
+                case 'Name':
+                    $query->where('name', 'like', $search . '%');
+                    break;
+            }
+        });
+
+        $query->when($filters['illegal'] == 'false', function ($query) {
+            $query->where('illegal', false);
+        });
+
+        return $query;
+    }
 }

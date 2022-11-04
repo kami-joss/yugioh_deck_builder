@@ -4,6 +4,7 @@
       <p class="text-h6">{{ deck.name }}</p>
       <p class="text-caption">By {{ deck.user?.name }}</p>
       <p>{{ deck.cards?.main?.length }} cards</p>
+      <q-chip color="negative" text-color="white" label="Forbidden" />
     </q-card-section>
     <q-card-section>
       <q-img

@@ -8,12 +8,20 @@
         <q-btn
           class=""
           color="pink-8"
-          label="Ajouter aux favoris"
+          label="Add to favorites"
           icon="favorite"
-          @click="addToFavorites"
+          @click="handleFavorite"
+        />
+        <q-btn
+          class=""
+          color="pink-8"
+          label="Remove from favorites"
+          icon="delete"
+          @click="handleFavorite"
         />
       </div>
     </div>
+
     <div class="row">
       <div class="col">
         <description-deck :deck="deck" />
@@ -76,11 +84,12 @@ const goBack = () => {
   window.history.back();
 };
 
-const addToFavorites = async () => {
+const handleFavorite = async () => {
   waitingApi.value = true;
 
+  const user = 1;
   const data = await api
-    .post(`/decks/${route.params.id}/favorites`)
+    .post(`/users/${user}/favorites`, { deck_id: route.params.id })
     .then((res) => {
       waitingApi.value = false;
       return res.data;

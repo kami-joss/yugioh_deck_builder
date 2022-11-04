@@ -11,14 +11,17 @@ class DecksController extends Controller
 
     public function index()
     {
-        $decks = Deck::public()->with('user:id,name')->paginate();
-        return response()->json($decks, 201);
+        $decks = Deck::public()->filtered(request()->only(['search', 'searchBy', 'illegal']))
+            ->with('user:id,name')
+            ->paginate(25)
+            ->withQueryString();
+        return response()->json($decks, 200);
     }
 
     public function show(Deck $deck)
     {
         $deck->load('user:id,name', 'cards', 'cards.image');
-        return response()->json($deck, 201);
+        return response()->json($deck, 200);
     }
 
     public function store()
@@ -41,6 +44,7 @@ class DecksController extends Controller
             'image_id' => 'nullable',
             'public' => 'required',
         ]);
+
         if (!$deck) {
             $deck = Deck::create([
                 'name' => request()->name,
@@ -50,6 +54,7 @@ class DecksController extends Controller
                 'public' => request()->public,
             ]);
             $deck->cards()->sync(request()->cards);
+            return response()->json($deck, 201);
         }
     }
 
@@ -58,5 +63,4 @@ class DecksController extends Controller
         $deck->delete();
         return response()->json(null, 204);
     }
-
 }

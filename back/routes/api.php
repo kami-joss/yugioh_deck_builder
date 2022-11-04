@@ -29,6 +29,14 @@ Route::post('/register', [UsersController::class, 'store']);
 
 Route::post('/sanctum/token', [AuthController::class, 'authenticate']);
 
+Route::post('users/{user}/favorites/{deck}', [UsersController::class, 'addFavorite']);
+
+Route::prefix('/users')->group(function () {
+    Route::get('/{user}', [UsersController::class, 'show']);
+    Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
+    Route::delete('/{user}/favorites', [UsersController::class, 'removeFavorite']);
+});
+
 Route::prefix('/cards')->group(function () {
     Route::get('/', [CardsController::class, 'index']);
     Route::get('/{card}', [CardsController::class, 'show']);
