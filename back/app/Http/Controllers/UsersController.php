@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Deck;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,11 +20,58 @@ class UsersController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    /**
+     * @param User $user
+     * @return \Illuminate\Http\Response
+     */
+    public function show(User $user)
+    {
+        return response()->json($user->load('favorites'), 201);
+    }
+
+    /**
+     * Create a new user instance after a valid registration.
+     * @param  \Illuminate\Http\Request  $request
+     */
     public function store()
     {
         return $this->handle();
     }
 
+    /**
+     * Add favorite deck to user
+     * @param Deck $deck, User $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addFavorite(User $user)
+    {
+        $deck = Deck::findorFail(request()->deck_id);
+
+        $user->favorites()->attach($deck->id);
+        $user->save();
+        return response()->json($user->favorites, 201);
+    }
+
+    /**
+     * Remove favorite deck from user
+     * @param User $user, Deck $deck
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function removeFavorite(User $user)
+    {
+        $deck = Deck::findorFail(request()->deck_id);
+
+        $user->favorites()->detach($deck->id);
+        $user->save();
+        return response()->json($user->favorites, 201);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * Handle update and create user
+     * @return \Illuminate\Http\Response
+     */
     public function handle(User $user = null)
     {
         $validate = Request::validate([

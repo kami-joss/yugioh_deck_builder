@@ -1,96 +1,79 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+  <div class="q-pa-md">
+    <q-layout view="hHh Lpr lff">
+      <q-header elevated>
+        <q-toolbar>
+          <q-btn
+            flat
+            dense
+            round
+            icon="menu"
+            aria-label="Menu"
+            @click="toggleLeftDrawer"
+          />
 
-        <q-toolbar-title>
-          Pro Deck Builder <br />
-          Yu-gi-oh!
-        </q-toolbar-title>
+          <q-toolbar-title>
+            Pro Deck Builder <br />
+            Yu-gi-oh!
+          </q-toolbar-title>
 
-        <div>
-          <a href="#/login"> Se connecter </a>
-        </div>
-      </q-toolbar>
-    </q-header>
+          <q-input rounded outlined :bg-color="'white'">
+            <template v-slot:append>
+              <q-btn flat rounded icon="search" />
+            </template>
+          </q-input>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+          <q-toggle
+            v-model="darkMode"
+            checked-icon="dark_mode"
+            unchecked-icon="light_mode"
+            color="dark"
+            size="lg"
+          />
+          <div>
+            <a href="#/login"> Se connecter </a>
+          </div>
+        </q-toolbar>
+      </q-header>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
+      <q-drawer v-model="leftDrawerOpen" overlay bordered>
+        <q-list>
+          <q-item-label header> Essential Links </q-item-label>
 
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+          <EssentialLink
+            v-for="link in essentialLinks"
+            :key="link.title"
+            v-bind="link"
+          />
+        </q-list>
+      </q-drawer>
+
+      <q-page-container>
+        <q-page>
+          <router-view />
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </div>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
+import { useQuasar } from "quasar";
 
 const linksList = [
   {
     title: "Home",
-    icon: "home",
-    link: "/",
+    link: "/#/",
   },
   {
-    title: "Docs",
-    caption: "quasar.dev",
-    icon: "school",
-    link: "https://quasar.dev",
+    title: "Decks",
+    link: "/#/decks",
   },
   {
-    title: "Github",
-    caption: "github.com/quasarframework",
-    icon: "code",
-    link: "https://github.com/quasarframework",
-  },
-  {
-    title: "Discord Chat Channel",
-    caption: "chat.quasar.dev",
-    icon: "chat",
-    link: "https://chat.quasar.dev",
-  },
-  {
-    title: "Forum",
-    caption: "forum.quasar.dev",
-    icon: "record_voice_over",
-    link: "https://forum.quasar.dev",
-  },
-  {
-    title: "Twitter",
-    caption: "@quasarframework",
-    icon: "rss_feed",
-    link: "https://twitter.quasar.dev",
-  },
-  {
-    title: "Facebook",
-    caption: "@QuasarFramework",
-    icon: "public",
-    link: "https://facebook.quasar.dev",
-  },
-  {
-    title: "Quasar Awesome",
-    caption: "Community Quasar projects",
-    icon: "favorite",
-    link: "https://awesome.quasar.dev",
+    title: "Deck Builder",
+    link: "/#/deck-builder",
   },
 ];
 
@@ -103,6 +86,15 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
+    const $q = useQuasar();
+    const darkMode = ref(
+      localStorage.getItem("darkMode") == "true" ? true : false
+    );
+
+    watch(darkMode, (val) => {
+      $q.dark.toggle();
+      localStorage.setItem("darkMode", val);
+    });
 
     return {
       essentialLinks: linksList,
@@ -110,6 +102,7 @@ export default defineComponent({
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
+      darkMode,
     };
   },
 });

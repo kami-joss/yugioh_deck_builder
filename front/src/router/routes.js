@@ -2,7 +2,25 @@ const routes = [
   {
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/IndexPage.vue") }],
+    children: [
+      { path: "", component: () => import("pages/IndexPage.vue") },
+      {
+        path: "/card/:id",
+        component: () => import("pages/cards/ShowCard.vue"),
+      },
+      {
+        path: "/deck-builder",
+        component: () => import("pages/DeckBuilderPage.vue"),
+      },
+      {
+        path: "/decks",
+        component: () => import("pages/decks/DecksIndexPage.vue"),
+      },
+      {
+        path: "/decks/:id",
+        component: () => import("pages/decks/DeckViewPage.vue"),
+      },
+    ],
   },
   {
     path: "/login",
@@ -16,13 +34,6 @@ const routes = [
     component: () => import("layouts/LoginLayout.vue"),
     children: [
       { path: "", component: () => import("pages/auth/RegisterPage.vue") },
-    ],
-  },
-  {
-    path: "/cards/:id",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
-      { path: "", component: () => import("pages/cards/ShowPage.vue") },
     ],
   },
 

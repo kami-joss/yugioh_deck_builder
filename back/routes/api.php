@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CardsController;
+use App\Http\Controllers\DecksController;
 use App\Http\Controllers\UsersController;
 
 /*
@@ -28,6 +29,14 @@ Route::post('/register', [UsersController::class, 'store']);
 
 Route::post('/sanctum/token', [AuthController::class, 'authenticate']);
 
+Route::post('users/{user}/favorites/{deck}', [UsersController::class, 'addFavorite']);
+
+Route::prefix('/users')->group(function () {
+    Route::get('/{user}', [UsersController::class, 'show']);
+    Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
+    Route::delete('/{user}/favorites', [UsersController::class, 'removeFavorite']);
+});
+
 Route::prefix('/cards')->group(function () {
     Route::get('/', [CardsController::class, 'index']);
     Route::get('/{card}', [CardsController::class, 'show']);
@@ -37,4 +46,16 @@ Route::prefix('/cards')->group(function () {
     Route::put('/{card}', [CardsController::class, 'update']);
 
     Route::delete('/{card}', [CardsController::class, 'destroy']);
+});
+
+
+Route::prefix('/decks')->group(function () {
+    route::get('/', [DecksController::class, 'index']);
+    route::get('/{deck}', [DecksController::class, 'show']);
+
+    route::post('/', [DecksController::class, 'store']);
+
+    route::put('/{deck}', [DecksController::class, 'update']);
+
+    route::delete('/{deck}', [DecksController::class, 'delete']);
 });
