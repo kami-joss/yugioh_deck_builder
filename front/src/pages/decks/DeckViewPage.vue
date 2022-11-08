@@ -30,7 +30,12 @@
           </div>
 
           <div v-if="deck.user?.id == userStore.user?.id">
-            <q-btn label="Edit" icon="edit" color="primary" />
+            <q-btn
+              label="Edit"
+              icon="edit"
+              color="primary"
+              @click="router.push(`/decks/edit/${deck.id}`)"
+            />
             <q-btn
               label="Delete"
               icon="delete"
@@ -174,7 +179,7 @@ const onClone = async (deckOptions) => {
         icon: "check",
       });
       modalClone.value = false;
-      router.push(`/decks/${res.data.id}`);
+      router.push(`/decks/edit/${res.data.id}`);
     });
 };
 

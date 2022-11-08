@@ -382,6 +382,34 @@ const onSearch = (form) => {
 };
 
 onMounted(async () => {
+  if (route.params.id) {
+    waitingApi.value = true;
+    await api
+      .get(`/decks/${route.params.id}/edit`)
+      .then((res) => {
+        waitingApi.value = false;
+        res.data.cards.forEach((card) => {
+          if (isExtraDeck(card.type)) {
+            deck.extra.push(card);
+          } else {
+            deck.main.push(card);
+          }
+        });
+      })
+      .catch((err) => {
+        waitingApi.value = false;
+        switch (err.response.status) {
+          case 403:
+            $q.notify({
+              message: "You don't have the permission to edit this deck",
+              color: "negative",
+              position: "top",
+            });
+            router.replace("/");
+            break;
+        }
+      });
+  }
   await getCards();
 });
 

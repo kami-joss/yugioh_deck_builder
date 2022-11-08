@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Deck;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DecksController extends Controller
@@ -24,12 +25,26 @@ class DecksController extends Controller
         return response()->json($deck, 200);
     }
 
+    public function edit(Deck $deck,)
+    {
+        if (auth('sanctum')->user()) {
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
+
+            if ($user->cannot('update', $deck)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            return $this->show($deck);
+        }
+        return response()->json('Unauthorized', 403);
+    }
+
     public function store()
     {
         $this->handle();
     }
 
-    public function update(Request $request, Deck $deck)
+    public function update(Deck $deck)
     {
         $this->handle($deck);
     }
