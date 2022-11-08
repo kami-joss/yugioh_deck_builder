@@ -12,30 +12,27 @@
 <script>
 import { ref } from "vue";
 import { api } from "boot/axios";
+import { useUserStore } from "src/stores/user";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   setup() {
+    const userStore = useUserStore();
+
+    const route = useRoute();
+    const router = useRouter();
+
     const email = ref(null);
     const password = ref(null);
 
     return {
       email,
       password,
+      router,
       onSubmit() {
-        api
-          .post("/sanctum/token", {
-            email: email.value,
-            password: password.value,
-          })
-          .then((response) => {
-            localStorage.setItem("sanctum_token", response.data);
-            axios.defaults.headers.common[
-              "Authorization"
-            ] = `Bearer ${response.data}`;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        userStore.login(email.value, password.value).then(() => {
+          router.back();
+        });
       },
     };
   },

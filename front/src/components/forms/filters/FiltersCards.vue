@@ -1,12 +1,6 @@
 <template>
   <q-card class="q-px-md q-py-md filters-container">
-    <q-input
-      v-model="monstersForm.name"
-      rounded
-      outlined
-      :bg-color="'white'"
-      :debounce="1000"
-    >
+    <q-input v-model="monstersForm.name" outlined dense filled :debounce="1000">
       <template v-slot:append>
         <q-btn flat rounded icon="search" @click="onSearch" />
       </template>

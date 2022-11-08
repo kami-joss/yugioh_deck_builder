@@ -3,22 +3,23 @@
     <modal-spinner v-model="waitingApi" />
 
     <div class="row justify-between q-mb-md">
-      <q-btn label="Retour" icon="arrow_back" @click="goBack" />
-      <div>
+      <q-btn label="Back" icon="arrow_back" flat @click="goBack" />
+      <div v-if="userStore.user && deck.user?.id != userStore.user?.id">
         <q-btn
-          class=""
-          color="pink-8"
-          label="Add to favorites"
-          icon="favorite"
-          @click="handleFavorite"
-        />
-        <q-btn
-          class=""
+          v-if="userStore.user.favorites?.find((f) => f.id == deck.id)"
           color="pink-8"
           label="Remove from favorites"
           icon="delete"
-          @click="handleFavorite"
+          @click="removeFromFavorites"
         />
+        <q-btn
+          v-else
+          color="pink-8"
+          label="Add to favorites"
+          icon="favorite"
+          @click="addToFavorites"
+        />
+        <q-btn label="Clone" icon="content_copy" />
       </div>
     </div>
 
@@ -47,7 +48,9 @@ import { defineProps, onMounted, reactive, ref, watch } from "vue";
 import { api } from "boot/axios";
 import { useRoute } from "vue-router";
 import { useCardStore } from "src/stores/card";
+import { useUserStore } from "src/stores/user";
 import { isExtraDeck } from "src/utils/cardUtils";
+import { useQuasar, Platform } from "quasar";
 
 import DescriptionDeck from "src/components/decks/DescriptionDeck.vue";
 import DeckList from "src/components/cards/DeckList.vue";
@@ -55,8 +58,13 @@ import DescMonsterCard from "src/components/cards/DescMonsterCard.vue";
 import DescSpellCard from "src/components/cards/DescSpellCard.vue";
 import ModalSpinner from "src/components/modals/ModalSpinner.vue";
 
+const userStore = useUserStore();
+
 const route = useRoute();
+
 const waitingApi = ref(false);
+
+const $q = useQuasar();
 
 const deck = ref({});
 const getDeck = async () => {
@@ -73,10 +81,10 @@ const getDeck = async () => {
   });
 };
 
-const CardStore = useCardStore();
-const cardShowing = ref(CardStore);
+const cardStore = useCardStore();
+const cardShowing = ref(cardStore);
 
-CardStore.$subscribe((state) => {
+cardStore.$subscribe((state) => {
   cardShowing.value = state.payload.card;
 });
 
@@ -84,17 +92,40 @@ const goBack = () => {
   window.history.back();
 };
 
-const handleFavorite = async () => {
-  waitingApi.value = true;
-
-  const user = 1;
-  const data = await api
-    .post(`/users/${user}/favorites`, { deck_id: route.params.id })
+const addToFavorites = async () => {
+  const userId = userStore.user.id;
+  await api
+    .post(`/users/${userId}/favorites`, {
+      deck_id: route.params.id,
+    })
     .then((res) => {
-      waitingApi.value = false;
-      return res.data;
+      userStore.setFavorites(res.data);
+      $q.notify({
+        message: "Deck added to favorites",
+        color: "positive",
+        position: "top",
+        icon: "check",
+      });
     });
-  deck.value = data;
+};
+
+const removeFromFavorites = async () => {
+  const userId = userStore.user.id;
+  await api
+    .delete(`/users/${userId}/favorites`, {
+      data: {
+        deck_id: route.params.id,
+      },
+    })
+    .then((res) => {
+      userStore.setFavorites(res.data);
+      $q.notify({
+        message: "Deck removed from favorites",
+        color: "positive",
+        position: "top",
+        icon: "check",
+      });
+    });
 };
 
 onMounted(async () => {

@@ -46,11 +46,15 @@ class UsersController extends BaseController
      */
     public function addFavorite(User $user)
     {
-        $deck = Deck::findorFail(request()->deck_id);
+        $deck = Deck::find(request()->deck_id);
 
-        $user->favorites()->attach($deck->id);
-        $user->save();
-        return response()->json($user->favorites, 201);
+        if($deck) {
+            $user->favorites()->attach($deck->id);
+            $user->save();
+            return response()->json($user->favorites, 201);
+        }
+
+        return response()->json('Deck not found', 404);
     }
 
     /**
@@ -60,11 +64,15 @@ class UsersController extends BaseController
      */
     public function removeFavorite(User $user)
     {
-        $deck = Deck::findorFail(request()->deck_id);
+        $deck = Deck::find(request()->deck_id);
 
-        $user->favorites()->detach($deck->id);
-        $user->save();
-        return response()->json($user->favorites, 201);
+        if($deck) {
+            $user->favorites()->detach($deck->id);
+            $user->save();
+            return response()->json($user->favorites, 201);
+        }
+
+        return response()->json('Deck not found', 404);
     }
 
     /**
@@ -75,8 +83,9 @@ class UsersController extends BaseController
     public function handle(User $user = null)
     {
         $validate = Request::validate([
-            'email' => ['required', 'email'],
+            'email' => ['required'],
             'password' => ['required'],
+            'password_confirmation' => ['required'],
             'name' => ['required'],
         ]);
 
@@ -94,14 +103,14 @@ class UsersController extends BaseController
                 'name' => Request::get('name'),
             ]);
             $user->save();
-            return request()->json(200, ['message' => 'User updated']);
+            return request()->json(201, ['message' => 'User updated']);
         } else {
             $user = User::create([
                 'email' => Request::get('email'),
                 'password' => Hash::make(Request::get('password')),
                 'name' => Request::get('name'),
             ]);
-            return request()->json(200, [
+            return request()->json(201, [
                 'message' => 'User created successfully',
                 'user' => $user,
             ]);

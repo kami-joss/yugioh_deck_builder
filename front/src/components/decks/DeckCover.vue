@@ -20,6 +20,9 @@
 
 <script setup>
 import { defineProps } from "vue";
+import { useUserStore } from "src/stores/user";
+
+const userStore = useUserStore();
 
 const props = defineProps({
   deck: {

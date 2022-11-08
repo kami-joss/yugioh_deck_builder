@@ -21,17 +21,20 @@ use App\Http\Controllers\UsersController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::group(['middleware' => ['web']], function () {
-    Route::post('/login', [AuthController::class, 'authenticate']);
-});
+// Route::group(['middleware' => ['web']], function () {
+//     Route::post('/login', [AuthController::class, 'authenticate']);
+// });
 
 Route::post('/register', [UsersController::class, 'store']);
 
 Route::post('/sanctum/token', [AuthController::class, 'authenticate']);
+Route::post('/sanctum/logout', [AuthController::class, 'logout']);
+
+route::get('auth', [AuthController::class, 'index']);
 
 Route::post('users/{user}/favorites/{deck}', [UsersController::class, 'addFavorite']);
 
-Route::prefix('/users')->group(function () {
+Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
     Route::get('/{user}', [UsersController::class, 'show']);
     Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
     Route::delete('/{user}/favorites', [UsersController::class, 'removeFavorite']);

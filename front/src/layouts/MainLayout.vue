@@ -30,8 +30,26 @@
             color="dark"
             size="lg"
           />
-          <div>
+          <div v-if="!userStore.user">
             <a href="#/login"> Se connecter </a>
+          </div>
+          <div v-else class="">
+            <!-- <q-avatar size="md" text-color="white" color="primary">
+              <img :src="userStore.user?.photoURL" />
+            </q-avatar> -->
+            <q-avatar size="xl" text-color="white" color="primary">
+              <img :src="userStore.user?.photoURL" />
+              <q-menu transition-show="flip-right" transition-hide="flip-left">
+                <q-list style="min-width: 100px">
+                  <q-item clickable tag="a" href="/user/manage">
+                    <q-item-section>Manage</q-item-section>
+                  </q-item>
+                  <q-item clickable @click="userStore.logout()">
+                    <q-item-section>Loggout</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-avatar>
           </div>
         </q-toolbar>
       </q-header>
@@ -61,6 +79,7 @@
 import { defineComponent, ref, watch } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import { useQuasar } from "quasar";
+import { useUserStore } from "src/stores/user";
 
 const linksList = [
   {
@@ -86,6 +105,7 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
+
     const $q = useQuasar();
     const darkMode = ref(
       localStorage.getItem("darkMode") == "true" ? true : false
@@ -96,6 +116,8 @@ export default defineComponent({
       localStorage.setItem("darkMode", val);
     });
 
+    const userStore = useUserStore();
+
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
@@ -103,6 +125,7 @@ export default defineComponent({
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
       darkMode,
+      userStore,
     };
   },
 });

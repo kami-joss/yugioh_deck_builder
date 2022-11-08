@@ -42,18 +42,36 @@ class AuthController extends BaseController
     public function authenticate(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required'],
             'password' => ['required'],
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->with('favorites')->first();
 
         if ($user && !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json(
+                'The provided credentials do not match our records.',
+                401,
+            );
         }
 
-        return $user->createToken($request->email)->plainTextToken;
+        return response()->json([
+            'token' => $user->createToken($request->email)->plainTextToken,
+            'user' => $user
+        ], 201);
+    }
+
+    public function logout()
+    {
+        $user = User::where('id', auth('sanctum')->user()?->id)->first();
+        if($user) {
+            $user->tokens()->delete();
+            return response()->json('Logged out', 200);
+        }
+        return response()->json('User not found', 404);
+    }
+
+    public function index () {
+        dd(auth('sanctum')->user());
     }
 }

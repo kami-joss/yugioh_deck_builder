@@ -9,7 +9,7 @@
       :debounce="1000"
     >
       <template v-slot:append>
-        <q-btn round dense flat icon="search" />
+        <q-btn round dense flat icon="search" @click="onClick" />
       </template>
     </q-input>
     <q-select
@@ -37,8 +37,11 @@ const props = defineProps({
 
 const form = reactive(props.modelValue);
 
-const emits = defineEmits(["input"]);
-
+const emits = defineEmits(["input", "click"]);
+const onClick = () => {
+  console.log(form);
+  emits("input", form);
+};
 watch(
   () => form,
   (val) => {
