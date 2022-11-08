@@ -14,7 +14,7 @@
           v-for="deck in decks.data"
           :deck="deck"
           :key="deck.id"
-          class="col-1"
+          class="col-sm-5 col-md-2 col-lg-1"
         />
       </div>
     </div>
@@ -23,7 +23,7 @@
       <q-pagination
         v-model="currentPage"
         :max-pages="5"
-        :max="decks.last_page"
+        :max="decks.last_page ?? 1"
         boundary-links
         boundary-number
       />
@@ -53,7 +53,6 @@ const getDecks = async () => {
     .get("/decks", {
       params: {
         ...route.query,
-        page: currentPage.value,
       },
     })
     .then((res) => {

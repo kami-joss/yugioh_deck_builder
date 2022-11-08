@@ -69,7 +69,7 @@ const onSave = () => {
   state.value = false;
 };
 
-const emits = defineEmits(["save"]);
+const emits = defineEmits(["save", "update:modelValue"]);
 
 watch(
   () => props.modelValue,

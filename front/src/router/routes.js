@@ -9,7 +9,11 @@ const routes = [
         component: () => import("pages/cards/ShowCard.vue"),
       },
       {
-        path: "/deck-builder",
+        path: "/decks/create",
+        component: () => import("pages/DeckBuilderPage.vue"),
+      },
+      {
+        path: "/decks/edit/:id",
         component: () => import("pages/DeckBuilderPage.vue"),
       },
       {

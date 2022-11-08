@@ -57,6 +57,7 @@ Route::prefix('/decks')->group(function () {
     route::get('/{deck}', [DecksController::class, 'show']);
 
     route::post('/', [DecksController::class, 'store']);
+    Route::post('/{deck}/clone', [DecksController::class, 'clone']);
 
     route::put('/{deck}', [DecksController::class, 'update']);
 

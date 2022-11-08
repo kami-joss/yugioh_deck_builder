@@ -92,7 +92,7 @@ const linksList = [
   },
   {
     title: "Deck Builder",
-    link: "/#/deck-builder",
+    link: "/#/decks/create",
   },
 ];
 

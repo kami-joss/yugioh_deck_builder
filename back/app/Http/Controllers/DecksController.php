@@ -34,6 +34,29 @@ class DecksController extends Controller
         $this->handle($deck);
     }
 
+    public function clone(Deck $deck)
+    {
+        request()->validate([
+            'name' => 'required',
+            'description' => 'max:255',
+            'user_id' => 'required',
+            'image_id' => 'nullable',
+            'public' => 'required',
+        ]);
+
+        $deckCopy = Deck::create([
+            'name' => request()->name,
+            'description' => request()->description,
+            'user_id' => request()->user_id,
+            'image_id' => request()->image_id,
+            'public' => request()->public
+        ]);
+        $deckCopy->cards()->sync($deck->cards);
+        $deckCopy->save();
+
+        return response()->json($deckCopy, 201);
+    }
+
     public function handle(Deck $deck = null)
     {
         request()->validate([
