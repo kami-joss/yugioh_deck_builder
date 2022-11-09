@@ -48,14 +48,26 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  name: {
+    type: String,
+    default: "",
+  },
+  isPublic: {
+    type: Boolean,
+    default: true,
+  },
+  description: {
+    type: String,
+    default: "",
+  },
 });
 
 const state = ref(props.modelValue);
 
 const form = reactive({
-  name: "",
-  description: "",
-  isPublic: false,
+  name: props.name,
+  description: props.description,
+  isPublic: props.isPublic,
 });
 
 const nameRef = ref(null);
@@ -72,10 +84,14 @@ const onSave = () => {
 const emits = defineEmits(["save", "update:modelValue"]);
 
 watch(
-  () => props.modelValue,
+  () => props,
   (val) => {
     state.value = props.modelValue;
-  }
+    // form.name = props.name;
+    // form.description = props.description;
+    // form.isPublic = props.isPublic;
+  },
+  { deep: true }
 );
 
 watch(

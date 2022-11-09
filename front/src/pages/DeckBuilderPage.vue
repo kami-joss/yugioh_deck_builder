@@ -1,19 +1,23 @@
 <template>
   <div>
     <div class="header">
-      <q-btn
-        label="Save"
-        icon="save"
-        size="md"
-        color="primary"
-        @click="modalSaveDeck = true"
-      />
-      <q-btn
-        label="Reset"
-        size="md"
-        color="primary"
-        @click="modalWarnReset = true"
-      />
+      <q-btn label="Back" icon="arrow_back" flat @click="router.back()" />
+      <p class="text-h6">{{ deck.data.name }}</p>
+      <div>
+        <q-btn
+          label="Save"
+          icon="save"
+          size="md"
+          color="primary"
+          @click="modalSaveDeck = true"
+        />
+        <q-btn
+          label="Reset"
+          size="md"
+          color="primary"
+          @click="modalWarnReset = true"
+        />
+      </div>
     </div>
     <div v-if="$q.platform.is.desktop" class="row index-row">
       <div class="col-5 deck-container">
@@ -147,7 +151,13 @@
       @add:card="addCardToDeck"
     />
 
-    <modal-save-deck v-model="modalSaveDeck" @save="saveDeck" />
+    <modal-save-deck
+      v-model="modalSaveDeck"
+      :description="deck.data?.description"
+      :name="deck.data?.name"
+      :isPublic="deck.data?.public ? true : false"
+      @save="saveDeck"
+    />
 
     <modal-confirm
       v-model="modalWarnReset"
@@ -165,7 +175,7 @@ import { onMounted, reactive, ref, watch } from "vue";
 import { api } from "boot/axios";
 import { useRoute, useRouter } from "vue-router";
 import { useQuasar, Platform } from "quasar";
-
+import { useUserStore } from "src/stores/user";
 import FiltersCards from "src/components/forms/filters/FiltersCards.vue";
 import YgoCard from "src/components/cards/YgoCard.vue";
 import CardsList from "src/components/cards/CardsList.vue";
@@ -178,9 +188,13 @@ import ModalConfirm from "src/components/modals/ModalConfirm.vue";
 import { isExtraDeck } from "src/utils/cardUtils";
 import ModalSpinner from "src/components/modals/ModalSpinner.vue";
 
+const userStore = useUserStore();
+
 const router = useRouter();
 const route = useRoute();
 const $q = useQuasar();
+
+const formType = ref(route.params.id ? "edit" : "create");
 
 const current_page = ref(1);
 const cards = ref([]);
@@ -188,6 +202,7 @@ const deck = reactive({
   main: [],
   extra: [],
   side: [],
+  data: {},
 });
 const cardShowing = ref(null);
 const tab = ref("card");
@@ -206,30 +221,62 @@ const saveDeck = (deckOptions) => {
     ...deck.extra.map((card) => card.id),
     ...deck.side.map((card) => card.id),
   ];
-  api
-    .post("/decks", {
-      ...deckOptions,
-      cards,
-      public: deckOptions.isPublic,
-      user_id: 1,
-    })
-    .then((res) => {
-      waitingApi.value = false;
-      $q.notify({
-        message: "Deck saved",
-        color: "positive",
-        position: "top",
-        icon: "check",
+
+  if (formType.value == "create") {
+    api
+      .post("/decks", {
+        ...deckOptions,
+        cards,
+        public: deckOptions.isPublic,
+        user_id: userStore.user.id,
+      })
+      .then((res) => {
+        waitingApi.value = false;
+        window.location.reload();
+        $q.notify({
+          message: "Deck saved",
+          color: "positive",
+          position: "top",
+          icon: "check",
+        });
+      })
+      .catch((err) => {
+        waitingApi.value = false;
+        $q.notify({
+          message: "An error occured. Please try again later.",
+          color: "negative",
+          position: "top",
+        });
       });
-    })
-    .catch((err) => {
-      waitingApi.value = false;
-      $q.notify({
-        message: "An error occured. Please try again later.",
-        color: "negative",
-        position: "top",
+  }
+
+  if (formType.value == "edit") {
+    api
+      .put(`/decks/${route.params.id}`, {
+        ...deckOptions,
+        cards,
+        public: deckOptions.isPublic,
+        user_id: userStore.user.id,
+      })
+      .then((res) => {
+        waitingApi.value = false;
+        $q.notify({
+          message: "Deck saved",
+          color: "positive",
+          position: "top",
+          icon: "check",
+        });
+        window.location.reload();
+      })
+      .catch((err) => {
+        waitingApi.value = false;
+        $q.notify({
+          message: "An error occured. Please try again later.",
+          color: "negative",
+          position: "top",
+        });
       });
-    });
+  }
 };
 
 const modalWarnReset = ref(false);
@@ -388,6 +435,8 @@ onMounted(async () => {
       .get(`/decks/${route.params.id}/edit`)
       .then((res) => {
         waitingApi.value = false;
+        deck.data = res.data;
+
         res.data.cards.forEach((card) => {
           if (isExtraDeck(card.type)) {
             deck.extra.push(card);
@@ -398,7 +447,7 @@ onMounted(async () => {
       })
       .catch((err) => {
         waitingApi.value = false;
-        switch (err.response.status) {
+        switch (err.response?.status) {
           case 403:
             $q.notify({
               message: "You don't have the permission to edit this deck",
@@ -469,8 +518,8 @@ watch(
 
 .header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 1rem;
-  margin: 1rem;
+  margin-bottom: 1rem;
 }
 </style>

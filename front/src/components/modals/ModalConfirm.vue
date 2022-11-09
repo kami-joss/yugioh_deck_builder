@@ -46,7 +46,7 @@ const props = defineProps({
 
 const state = ref(props.modelValue);
 
-const emits = defineEmits(["save"]);
+const emits = defineEmits(["cancel", "confirm", "update:modelValue"]);
 
 watch(
   () => props.modelValue,

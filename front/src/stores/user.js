@@ -25,19 +25,17 @@ export const useUserStore = defineStore("user", {
           api.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.token}`;
-          console.log(api.defaults.headers.common["Authorization"]);
         })
         .catch((error) => {
           console.log(error);
         });
     },
     async logout() {
-      api.post("/sanctum/logout").then((response) => {
-        api.defaults.headers.common["Authorization"] = ``;
-        localStorage.removeItem("user");
-        window.location.reload;
-        this.setUser(null);
-      });
+      api.defaults.headers.common["Authorization"] = ``;
+      localStorage.removeItem("user");
+      window.location.reload;
+      this.setUser(null);
+      api.post("/sanctum/logout").then((response) => {});
     },
     async setUser(user) {
       this.user = user;

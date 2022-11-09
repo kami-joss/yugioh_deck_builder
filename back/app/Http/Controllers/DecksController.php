@@ -46,7 +46,16 @@ class DecksController extends Controller
 
     public function update(Deck $deck)
     {
-        $this->handle($deck);
+        if (auth('sanctum')->user()) {
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
+
+            if ($user->cannot('update', $deck)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            return $this->handle($deck);
+        }
+
     }
 
     public function clone(Deck $deck)
@@ -66,7 +75,7 @@ class DecksController extends Controller
             'image_id' => request()->image_id,
             'public' => request()->public
         ]);
-        $deckCopy->cards()->sync($deck->cards);
+        $deckCopy->cards()->attach($deck->cards);
         $deckCopy->save();
 
         return response()->json($deckCopy, 201);
@@ -83,6 +92,7 @@ class DecksController extends Controller
             'public' => 'required',
         ]);
 
+
         if (!$deck) {
             $deck = Deck::create([
                 'name' => request()->name,
@@ -91,14 +101,25 @@ class DecksController extends Controller
                 'image_id' => request()->image_id,
                 'public' => request()->public,
             ]);
-            $deck->cards()->sync(request()->cards);
+            $deck->cards()->attach(request()->cards);
             return response()->json($deck, 201);
         }
+
+        $deck->update([
+            'name' => request()->name,
+            'description' => request()->description,
+            'user_id' => request()->user_id,
+            'image_id' => request()->image_id,
+            'public' => request()->public,
+        ]);
+        $deck->cards()->detach();
+        $deck->cards()->attach(request()->cards);
     }
 
     public function delete(Deck $deck)
     {
+        $deck->cards()->detach();
         $deck->delete();
-        return response()->json(null, 204);
+        return response()->json('deleted', 204);
     }
 }
