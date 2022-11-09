@@ -72,6 +72,7 @@ class AuthController extends BaseController
     }
 
     public function index () {
+        return request()->header('Authorization');
         dd(auth('sanctum')->user());
     }
 }

@@ -19,20 +19,24 @@ export default defineComponent({
     const userStore = useUserStore();
     const userData = localStorage.getItem("user");
     const userToken = localStorage.getItem("token");
-    if (userData) {
-      userStore.$patch({ user: JSON.parse(userData) });
+
+    if (userData && userToken) {
+      userStore.$patch({
+        user: JSON.parse(userData),
+        token: userToken,
+      });
       api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
     }
 
-    api.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response.status === 401) {
-          userStore.logout();
-        }
-        return Promise.reject(error);
-      }
-    );
+    // api.interceptors.response.use(
+    //   (response) => response,
+    //   (error) => {
+    //     if (error.response.status === 401) {
+    //       userStore.logout();
+    //     }
+    //     return Promise.reject(error);
+    //   }
+    // );
   },
 });
 </script>

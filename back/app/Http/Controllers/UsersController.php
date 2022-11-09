@@ -46,7 +46,7 @@ class UsersController extends BaseController
      */
     public function addFavorite(User $user)
     {
-        $deck = Deck::find(request()->deck_id);
+        $deck = Deck::where('id', request()->deck_id)->first();
 
         if($deck) {
             $user->favorites()->attach($deck->id);

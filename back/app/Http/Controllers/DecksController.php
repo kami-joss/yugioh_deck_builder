@@ -36,7 +36,7 @@ class DecksController extends Controller
 
             return $this->show($deck);
         }
-        return response()->json('Unauthorized', 403);
+        return response()->json('No user auth', 403);
     }
 
     public function store()

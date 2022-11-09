@@ -4,10 +4,14 @@ import { api } from "src/boot/axios";
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: null,
+    token: null,
   }),
   getters: {
     getUser() {
       return this.user;
+    },
+    getToken() {
+      return this.token;
     },
   },
   actions: {
@@ -19,12 +23,10 @@ export const useUserStore = defineStore("user", {
         })
         .then((response) => {
           localStorage.setItem("user", JSON.stringify(response.data.user));
-          localStorage.setItem("token", JSON.stringify(response.data.token));
+          localStorage.setItem("token", response.data.token);
 
-          this.user = {
-            user: response.data.user,
-            token: response.data.token,
-          };
+          this.user = response.data.user;
+          this.token = response.data.token;
 
           api.defaults.headers.common[
             "Authorization"
@@ -35,11 +37,14 @@ export const useUserStore = defineStore("user", {
         });
     },
     async logout() {
-      api.defaults.headers.common["Authorization"] = ``;
-      localStorage.removeItem("user");
-      window.location.reload;
-      this.setUser(null);
-      api.post("/sanctum/logout").then((response) => {});
+      api.post("/sanctum/logout").then((response) => {
+        api.defaults.headers.common["Authorization"] = ``;
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        this.user = null;
+        this.token = null;
+        window.location.reload();
+      });
     },
     async setUser(user) {
       this.user = user;

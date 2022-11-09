@@ -12,9 +12,11 @@
       <div class="row justify-between q-mb-md">
         <q-btn label="Back" icon="arrow_back" flat @click="router.back()" />
         <div class="row items-center">
-          <div v-if="userStore.user && deck.user?.id != userStore.user?.id">
+          <div
+            v-if="userStore.getUser && deck.user?.id != userStore.getUser?.id"
+          >
             <q-btn
-              v-if="userStore.user.favorites?.find((f) => f.id == deck.id)"
+              v-if="userStore.getUser.favorites?.find((f) => f.id == deck.id)"
               color="pink-8"
               label="Remove from favorites"
               icon="delete"
@@ -29,7 +31,7 @@
             />
           </div>
 
-          <div v-if="deck.user?.id == userStore.user?.id">
+          <div v-if="deck.user?.id == userStore.getUser?.id">
             <q-btn
               label="Edit"
               icon="edit"
@@ -44,7 +46,7 @@
             />
           </div>
 
-          <div v-if="userStore.user">
+          <div v-if="userStore.getUser">
             <q-btn
               label="Clone"
               icon="content_copy"
@@ -127,7 +129,8 @@ cardStore.$subscribe((state) => {
 });
 
 const addToFavorites = async () => {
-  const userId = userStore.user.id;
+  const userId = userStore.getUser.id;
+
   await api
     .post(`/users/${userId}/favorites`, {
       deck_id: route.params.id,
@@ -144,7 +147,7 @@ const addToFavorites = async () => {
 };
 
 const removeFromFavorites = async () => {
-  const userId = userStore.user.id;
+  const userId = userStore.getUser.id;
   await api
     .delete(`/users/${userId}/favorites`, {
       data: {
@@ -164,7 +167,7 @@ const removeFromFavorites = async () => {
 
 const modalClone = ref(false);
 const onClone = async (deckOptions) => {
-  const userId = userStore.user.id;
+  const userId = userStore.getUser.id;
   await api
     .post(`/decks/${route.params.id}/clone`, {
       ...deckOptions,
@@ -205,6 +208,7 @@ const deleteDeck = async () => {
 };
 
 onMounted(async () => {
+  console.log(userStore.getUser.id);
   await getDeck();
 });
 </script>
