@@ -1,4 +1,5 @@
 import { route } from "quasar/wrappers";
+import { useUserStore } from "src/stores/user";
 import {
   createRouter,
   createMemoryHistory,
@@ -35,19 +36,20 @@ export default route(function (/* { store, ssrContext } */) {
     ),
   });
 
-  // const LoggedIn =  localStorage.getItem('user')
+  Router.beforeEach(async (to, from) => {
+    const userStore = useUserStore();
+    const LoggedIn = userStore.getUser;
 
-  // Router.beforeEach(async (to, from) => {
-  //   if (
-  //     // make sure the user is authenticated
-  //     !LoggedIn &&
-  //     // ❗️ Avoid an infinite redirect
-  //     to.name !== 'Login'
-  //   ) {
-  //     // redirect the user to the login page
-  //     return { name: 'Login' }
-  //   }
-  // })
+    if (
+      // make sure the user is authenticated
+      LoggedIn &&
+      // ❗️ Avoid an infinite redirect
+      to.path === "/login"
+    ) {
+      // redirect the user to the login page
+      return "/";
+    }
+  });
 
   return Router;
 });

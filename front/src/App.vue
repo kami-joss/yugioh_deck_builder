@@ -18,8 +18,10 @@ export default defineComponent({
   created() {
     const userStore = useUserStore();
     const userData = localStorage.getItem("user");
+    const userToken = localStorage.getItem("token");
     if (userData) {
       userStore.$patch({ user: JSON.parse(userData) });
+      api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
     }
 
     api.interceptors.response.use(

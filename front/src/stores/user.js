@@ -19,8 +19,12 @@ export const useUserStore = defineStore("user", {
         })
         .then((response) => {
           localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem("token", JSON.stringify(response.data.token));
 
-          this.user = response.data.user;
+          this.user = {
+            user: response.data.user,
+            token: response.data.token,
+          };
 
           api.defaults.headers.common[
             "Authorization"
