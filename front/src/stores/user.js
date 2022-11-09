@@ -52,5 +52,6 @@ export const useUserStore = defineStore("user", {
     async setFavorites(favorites) {
       this.user.favorites = favorites;
     },
+    async fetchUser() {},
   },
 });

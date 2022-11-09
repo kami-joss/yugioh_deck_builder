@@ -33,15 +33,16 @@
           <div v-if="!userStore.user">
             <a href="#/login"> Se connecter </a>
           </div>
-          <div v-else class="">
-            <!-- <q-avatar size="md" text-color="white" color="primary">
-              <img :src="userStore.user?.photoURL" />
-            </q-avatar> -->
+          <div v-else>
             <q-avatar size="xl" text-color="white" color="primary">
               <img :src="userStore.user?.photoURL" />
               <q-menu transition-show="flip-right" transition-hide="flip-left">
                 <q-list style="min-width: 100px">
-                  <q-item clickable tag="a" href="/user/manage">
+                  <q-item
+                    clickable
+                    tag="a"
+                    :href="`#/user/${userStore.getUser.id}`"
+                  >
                     <q-item-section>Manage</q-item-section>
                   </q-item>
                   <q-item clickable @click="userStore.logout()">

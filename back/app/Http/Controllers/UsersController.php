@@ -27,7 +27,21 @@ class UsersController extends BaseController
      */
     public function show(User $user)
     {
-        return response()->json($user->load('favorites'), 201);
+        return response()->json($user->load('favorites'), 200);
+    }
+
+    public function edit(User $user)
+    {
+        if (auth('sanctum')->user()) {
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
+
+            if ($user->cannot('update', $user)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            return $this->show($user);
+        }
+        return response()->json('No user auth', 403);
     }
 
     /**
@@ -39,6 +53,17 @@ class UsersController extends BaseController
         return $this->handle();
     }
 
+    public function update(User $user)
+    {
+        if (auth('sanctum')->user()) {
+            if ($user->cannot('update', $user)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            return $this->handle($user);
+        }
+    }
+
     /**
      * Add favorite deck to user
      * @param Deck $deck, User $user
@@ -48,7 +73,7 @@ class UsersController extends BaseController
     {
         $deck = Deck::where('id', request()->deck_id)->first();
 
-        if($deck) {
+        if ($deck) {
             $user->favorites()->attach($deck->id);
             $user->save();
             return response()->json($user->favorites, 201);
@@ -66,7 +91,7 @@ class UsersController extends BaseController
     {
         $deck = Deck::find(request()->deck_id);
 
-        if($deck) {
+        if ($deck) {
             $user->favorites()->detach($deck->id);
             $user->save();
             return response()->json($user->favorites, 201);
@@ -82,29 +107,44 @@ class UsersController extends BaseController
      */
     public function handle(User $user = null)
     {
-        $validate = Request::validate([
-            'email' => ['required'],
-            'password' => ['required'],
-            'password_confirmation' => ['required'],
-            'name' => ['required'],
-        ]);
 
-
-        if (Request::get('password') !== Request::get('password_confirmation')) {
-            return request()->json(401, [
-                'message' => 'The provided credentials do not match our records.',
-            ]);
+        if(Request::get('password')) {
+            if (Request::get('password') !== Request::get('password_confirmation')) {
+                return request()->json(401, [
+                    'message' => 'Passwords do not match',
+                ]);
+            }
         }
 
         if ($user) {
-            $user->update([
-                'email' => Request::get('email'),
-                'password' => Hash::make(Request::get('password')),
-                'name' => Request::get('name'),
+            Request::validate([
+                'email' => 'email|unique:users,email,' . $user->id,
+                'name' => 'unique:users,name,' . $user->id,
+                'password' => 'min:4|nullable|must_match:password_confirmation',
+                'password_confirmation' => 'min:4|nullable|must_match:password',
+            ]);
+
+            $password = Request::get('password') ? Hash::make(Request::get('password')) : $user->password;
+
+            $user->fill([
+                'email' => Request::get('email') ?? $user->email,
+                'name' => Request::get('name') ?? $user->name,
+                'password' => $password,
             ]);
             $user->save();
-            return request()->json(201, ['message' => 'User updated']);
+
+            return request()->json(200, [
+                'message' => 'User updated',
+                'user' => $user,
+            ]);
         } else {
+            Request::validate([
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:4|must_match:password_confirmation',
+                'password_confirmation' => 'required|min:4|must_match:password',
+                'name' => 'required|unique:users',
+            ]);
+
             $user = User::create([
                 'email' => Request::get('email'),
                 'password' => Hash::make(Request::get('password')),

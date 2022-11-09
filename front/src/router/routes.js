@@ -24,6 +24,10 @@ const routes = [
         path: "/decks/:id",
         component: () => import("pages/decks/DeckViewPage.vue"),
       },
+      {
+        path: "/user/:id",
+        component: () => import("pages/users/UserEditPage.vue"),
+      },
     ],
   },
   {
