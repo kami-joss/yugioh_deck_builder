@@ -55,7 +55,6 @@ class DecksController extends Controller
 
             return $this->handle($deck);
         }
-
     }
 
     public function clone(Deck $deck)
@@ -92,7 +91,6 @@ class DecksController extends Controller
             'public' => 'required',
         ]);
 
-
         if (!$deck) {
             $deck = Deck::create([
                 'name' => request()->name,
@@ -118,8 +116,16 @@ class DecksController extends Controller
 
     public function delete(Deck $deck)
     {
-        $deck->cards()->detach();
-        $deck->delete();
-        return response()->json('deleted', 204);
+        if (auth('sanctum')->user()) {
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
+
+            if ($user->cannot('delete', $deck)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            $deck->cards()->detach();
+            $deck->delete();
+            return response()->json('deleted', 204);
+        }
     }
 }

@@ -208,7 +208,6 @@ const deleteDeck = async () => {
 };
 
 onMounted(async () => {
-  console.log(userStore.getUser.id);
   await getDeck();
 });
 </script>

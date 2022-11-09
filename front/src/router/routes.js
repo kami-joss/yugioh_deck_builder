@@ -10,11 +10,11 @@ const routes = [
       },
       {
         path: "/decks/create",
-        component: () => import("pages/DeckBuilderPage.vue"),
+        component: () => import("pages/decks/DeckCreatePage.vue"),
       },
       {
         path: "/decks/edit/:id",
-        component: () => import("pages/DeckBuilderPage.vue"),
+        component: () => import("pages/decks/DeckEditPage.vue"),
       },
       {
         path: "/decks",

@@ -2,7 +2,7 @@
   <div>
     <div class="header">
       <q-btn label="Back" icon="arrow_back" flat @click="router.back()" />
-      <p class="text-h6">{{ deck.data.name }}</p>
+      <p class="text-h6">{{ deck.data?.name }}</p>
       <div>
         <q-btn
           label="Save"
@@ -152,10 +152,11 @@
     />
 
     <modal-save-deck
+      v-if="deck.data"
       v-model="modalSaveDeck"
-      :description="deck.data?.description"
-      :name="deck.data?.name"
-      :isPublic="deck.data?.public ? true : false"
+      :description="deck.data.description"
+      :name="deck.data.name"
+      :isPublic="deck.data.public ? true : false"
       @save="saveDeck"
     />
 
@@ -173,7 +174,7 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from "vue";
 import { api } from "boot/axios";
-import { useRoute, useRouter } from "vue-router";
+import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
 import { useQuasar, Platform } from "quasar";
 import { useUserStore } from "src/stores/user";
 import FiltersCards from "src/components/forms/filters/FiltersCards.vue";
@@ -202,7 +203,7 @@ const deck = reactive({
   main: [],
   extra: [],
   side: [],
-  data: {},
+  data: null,
 });
 const cardShowing = ref(null);
 const tab = ref("card");
@@ -428,46 +429,43 @@ const onSearch = (form) => {
   });
 };
 
+const getDeck = async () => {
+  await api
+    .get(`/decks/${route.params.id}/edit`)
+    .then((res) => {
+      waitingApi.value = false;
+      deck.data = res.data;
+
+      res.data.cards.forEach((card) => {
+        if (isExtraDeck(card.type)) {
+          deck.extra.push(card);
+        } else {
+          deck.main.push(card);
+        }
+      });
+    })
+    .catch((err) => {
+      waitingApi.value = false;
+      switch (err.response?.status) {
+        case 403:
+          $q.notify({
+            message: "You don't have the permission to edit this deck",
+            color: "negative",
+            position: "top",
+          });
+          router.replace("/");
+          break;
+      }
+    });
+};
+
 onMounted(async () => {
   if (route.params.id) {
     waitingApi.value = true;
-    await api
-      .get(`/decks/${route.params.id}/edit`)
-      .then((res) => {
-        waitingApi.value = false;
-        deck.data = res.data;
-
-        res.data.cards.forEach((card) => {
-          if (isExtraDeck(card.type)) {
-            deck.extra.push(card);
-          } else {
-            deck.main.push(card);
-          }
-        });
-      })
-      .catch((err) => {
-        waitingApi.value = false;
-        switch (err.response?.status) {
-          case 403:
-            $q.notify({
-              message: "You don't have the permission to edit this deck",
-              color: "negative",
-              position: "top",
-            });
-            router.replace("/");
-            break;
-        }
-      });
+    await getDeck();
   }
   await getCards();
 });
-
-watch(
-  () => route.query,
-  async (params) => {
-    await getCards(params);
-  }
-);
 </script>
 
 <style scoped lang="scss">

@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps, reactive, ref, watch } from "vue";
+import { defineEmits, defineProps, reactive, ref, toRef, watch } from "vue";
 
 const props = defineProps({
   modelValue: {
@@ -66,8 +66,8 @@ const state = ref(props.modelValue);
 
 const form = reactive({
   name: props.name,
-  description: props.description,
-  isPublic: props.isPublic,
+  description: toRef(props, "description"),
+  isPublic: toRef(props, "isPublic"),
 });
 
 const nameRef = ref(null);
@@ -84,14 +84,10 @@ const onSave = () => {
 const emits = defineEmits(["save", "update:modelValue"]);
 
 watch(
-  () => props,
+  () => props.modelValue,
   (val) => {
     state.value = props.modelValue;
-    // form.name = props.name;
-    // form.description = props.description;
-    // form.isPublic = props.isPublic;
-  },
-  { deep: true }
+  }
 );
 
 watch(
