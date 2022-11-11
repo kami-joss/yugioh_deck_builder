@@ -41,6 +41,7 @@
         />
       </div>
       <cards-list
+        v-if="cards.data"
         :cards="cards.data"
         class="col-4"
         @click:card="addCardToDeck"
@@ -99,6 +100,7 @@
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="cardList">
           <cards-list
+            v-if="cards.data"
             :cards="cards.data"
             class="col-12 col-lg-4"
             @load:scroll="onLoad"
@@ -152,11 +154,10 @@
     />
 
     <modal-save-deck
-      v-if="deck.data"
       v-model="modalSaveDeck"
-      :description="deck.data.description"
-      :name="deck.data.name"
-      :isPublic="deck.data.public ? true : false"
+      :description="deck.data?.description"
+      :name="deck.data?.name"
+      :isPublic="deck.data?.public ? true : false"
       @save="saveDeck"
     />
 

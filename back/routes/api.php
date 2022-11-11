@@ -35,6 +35,7 @@ Route::post('/sanctum/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
     Route::get('/{user}', [UsersController::class, 'show']);
     Route::get('/{user}/edit', [UsersController::class, 'edit']);
+    Route::get('/{user}/favorites', [UsersController::class, 'favorites']);
     Route::put('/{user}', [UsersController::class, 'update']);
     Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
     Route::delete('/{user}/favorites', [UsersController::class, 'removeFavorite']);

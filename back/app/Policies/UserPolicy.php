@@ -28,4 +28,14 @@ class UserPolicy
     {
         return $user->id === auth('sanctum')->user()->id;
     }
+
+    public function show(User $user)
+    {
+        return $user->id === auth('sanctum')->user()->id;
+    }
+
+    public function showFavorites(User $user)
+    {
+        return $user->id === auth('sanctum')->user()->id;
+    }
 }

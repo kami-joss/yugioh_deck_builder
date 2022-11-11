@@ -30,39 +30,19 @@
             color="dark"
             size="lg"
           />
-          <div v-if="!userStore.user">
-            <a href="#/login"> Se connecter </a>
-          </div>
-          <div v-else class="row">
+          <div v-if="userStore.getUser" class="row">
             <q-btn
               flat
               dense
               icon="favorite"
               aria-label="My favorites"
-              label="favorites"
+              label="My favorites"
+              @click="router.push(`/user/${userStore.getUser.id}/favorites`)"
             />
-            <div>
-              <q-avatar size="xl" text-color="white" color="primary">
-                <img :src="userStore.user?.photoURL" />
-                <q-menu
-                  transition-show="flip-right"
-                  transition-hide="flip-left"
-                >
-                  <q-list style="min-width: 100px">
-                    <q-item
-                      clickable
-                      tag="a"
-                      :href="`#/user/${userStore.getUser.id}`"
-                    >
-                      <q-item-section>Manage</q-item-section>
-                    </q-item>
-                    <q-item clickable @click="userStore.logout()">
-                      <q-item-section>Loggout</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-avatar>
-            </div>
+            <UsersHeaderMenu />
+          </div>
+          <div v-else>
+            <a href="#/login"> Se connecter </a>
           </div>
         </q-toolbar>
       </q-header>
@@ -93,6 +73,8 @@ import { defineComponent, ref, watch } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import { useQuasar } from "quasar";
 import { useUserStore } from "src/stores/user";
+import UsersHeaderMenu from "src/components/users/UsersHeaderMenu.vue";
+import { useRouter } from "vue-router";
 
 const linksList = [
   {
@@ -114,12 +96,15 @@ export default defineComponent({
 
   components: {
     EssentialLink,
+    UsersHeaderMenu,
   },
 
   setup() {
     const leftDrawerOpen = ref(false);
 
     const $q = useQuasar();
+    const router = useRouter();
+
     const darkMode = ref(
       localStorage.getItem("darkMode") == "true" ? true : false
     );
@@ -139,6 +124,7 @@ export default defineComponent({
       },
       darkMode,
       userStore,
+      router,
     };
   },
 });

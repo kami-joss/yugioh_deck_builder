@@ -65,6 +65,30 @@ class UsersController extends BaseController
     }
 
     /**
+     * Return a json response with the user's favorites decks
+     * @param User $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function favorites(User $user)
+    {
+        if (auth('sanctum')->user()) {
+            if ($user->cannot('showFavorites', $user)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            $decks = $user->favorites()
+                ->filtered(request()->only(['search', 'searchBy', 'illegal']))
+                ->with('user:id,name')
+                ->paginate(25)
+                ->withQueryString();
+
+            return response()->json($decks, 200);
+        }
+
+        return response()->json('No user auth', 403);
+    }
+
+    /**
      * Add favorite deck to user
      * @param Deck $deck, User $user
      * @return \Illuminate\Http\JsonResponse
@@ -76,6 +100,7 @@ class UsersController extends BaseController
         if ($deck) {
             $user->favorites()->attach($deck->id);
             $user->save();
+
             return response()->json($user->favorites, 201);
         }
 

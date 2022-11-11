@@ -2,7 +2,7 @@
   <div>
     <modal-spinner v-model="waitingApi" />
 
-    <h1>Decks</h1>
+    <h1>My Favorites</h1>
 
     <div class="column gap-2">
       <div class="column items-center">
@@ -26,26 +26,28 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
-import { api } from "boot/axios";
+import { api } from "src/boot/axios";
+import { useUserStore } from "src/stores/user";
+import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useQuasar, Platform } from "quasar";
+import { pickBy } from "lodash";
 
-import DecksFilters from "src/components/forms/decks/DecksFilters.vue";
-import DeckCover from "src/components/decks/DeckCover.vue";
+import DecksList from "src/components/decks/DecksList";
 import ModalSpinner from "src/components/modals/ModalSpinner.vue";
-import DecksList from "src/components/decks/DecksList.vue";
+import DecksFilters from "src/components/forms/decks/DecksFilters.vue";
+import { CLOSING } from "ws";
 
-const router = useRouter();
+const user = useUserStore();
 const route = useRoute();
+const router = useRouter();
 
+const decks = ref({});
 const waitingApi = ref(false);
+const currentPage = ref(route.query.page ?? 1);
 
-const decks = ref([]);
-const getDecks = async () => {
-  waitingApi.value = true;
+const fetchDecks = async () => {
   await api
-    .get("/decks", {
+    .get(`users/${user.getUser.id}/favorites`, {
       params: {
         ...route.query,
       },
@@ -56,25 +58,6 @@ const getDecks = async () => {
     });
 };
 
-watch(
-  () => route.query,
-  async (val) => {
-    await getDecks();
-  },
-  { deep: true }
-);
-
-const currentPage = ref(1);
-watch(currentPage, async (val) => {
-  router.push({
-    query: {
-      ...route.query,
-      page: val,
-    },
-  });
-  await getDecks();
-});
-
 const filters = ref({
   search: "",
   searchBy: "Name",
@@ -82,30 +65,29 @@ const filters = ref({
 });
 
 watch(
-  () => filters.value.search,
-  async (val) => {
+  () => filters,
+  async () => {
+    const params = pickBy(filters.value, (f) => f != "");
     router.push({
       query: {
         ...route.query,
-        search: val,
-        searchBy: filters.value.searchBy,
-        illegal: filters.value.illegal,
+        ...params,
       },
     });
   },
   { deep: true }
 );
 
+watch(
+  () => route.query,
+  async (val) => {
+    await fetchDecks();
+  },
+  { deep: true }
+);
+
 onMounted(async () => {
-  await getDecks();
+  waitingApi.value = true;
+  await fetchDecks();
 });
 </script>
-
-<style scoped>
-.deck-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-</style>

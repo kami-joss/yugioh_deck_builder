@@ -11,10 +11,8 @@
     <div v-if="deck">
       <div class="row justify-between q-mb-md">
         <q-btn label="Back" icon="arrow_back" flat @click="router.back()" />
-        <div class="row items-center">
-          <div
-            v-if="userStore.getUser && deck.user?.id != userStore.getUser?.id"
-          >
+        <div v-if="userStore.getUser" class="row items-center">
+          <div v-if="deck.user?.id != userStore.getUser?.id">
             <q-btn
               v-if="userStore.getUser.favorites?.find((f) => f.id == deck.id)"
               color="pink-8"
@@ -46,13 +44,7 @@
             />
           </div>
 
-          <div v-if="userStore.getUser">
-            <q-btn
-              label="Clone"
-              icon="content_copy"
-              @click="modalClone = true"
-            />
-          </div>
+          <q-btn label="Clone" icon="content_copy" @click="modalClone = true" />
         </div>
       </div>
 

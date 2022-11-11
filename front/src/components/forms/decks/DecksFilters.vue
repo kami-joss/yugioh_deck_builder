@@ -1,26 +1,28 @@
 <template>
-  <div class="row">
-    <q-input
-      v-model="form.search"
-      filled
-      dense
-      placeholder="Search deck"
-      icon="search"
-      :debounce="1000"
-    >
-      <template v-slot:append>
-        <q-btn round dense flat icon="search" @click="onClick" />
-      </template>
-    </q-input>
-    <q-select
-      v-model="form.searchBy"
-      outlined
-      dense
-      :options="options"
-      label="Search by"
-      class="select-searchBy"
-    />
-    <q-checkbox v-model="form.illegal" label="Include forbidden decks" />
+  <div>
+    <div class="row">
+      <q-input
+        v-model="form.search"
+        filled
+        dense
+        placeholder="Search deck"
+        icon="search"
+        :debounce="1000"
+      >
+        <template v-slot:append>
+          <q-btn round dense flat icon="search" @click="onClick" />
+        </template>
+      </q-input>
+      <q-select
+        v-model="form.searchBy"
+        outlined
+        dense
+        :options="options"
+        label="Search by"
+        class="select-searchBy"
+      />
+      <q-checkbox v-model="form.illegal" label="Include forbidden decks" />
+    </div>
   </div>
 </template>
 
@@ -37,9 +39,8 @@ const props = defineProps({
 
 const form = reactive(props.modelValue);
 
-const emits = defineEmits(["input", "click"]);
+const emits = defineEmits(["input", "click", "search"]);
 const onClick = () => {
-  console.log(form);
   emits("input", form);
 };
 watch(
