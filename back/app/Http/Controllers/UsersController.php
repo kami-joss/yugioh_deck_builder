@@ -23,7 +23,7 @@ class UsersController extends BaseController
 
     /**
      * @param User $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(User $user)
     {
@@ -101,18 +101,18 @@ class UsersController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * Handle update and create user
-     * @return \Illuminate\Http\Response
+     * @param User $user
+     * Handle update or create user
+     * @return \Illuminate\Http\JsonResponse
      */
     public function handle(User $user = null)
     {
 
-        if(Request::get('password')) {
+        if (Request::get('password')) {
             if (Request::get('password') !== Request::get('password_confirmation')) {
-                return request()->json(401, [
+                return response()->json([
                     'message' => 'Passwords do not match',
-                ]);
+                ], 401);
             }
         }
 
@@ -120,23 +120,34 @@ class UsersController extends BaseController
             Request::validate([
                 'email' => 'email|unique:users,email,' . $user->id,
                 'name' => 'unique:users,name,' . $user->id,
-                'password' => 'min:4|nullable|must_match:password_confirmation',
-                'password_confirmation' => 'min:4|nullable|must_match:password',
+                'old_password' => 'nullable|required_with:password,',
+                'password' => 'min:4|same:password_confirmation|nullable',
+                'password_confirmation' => 'min:4|same:password|required_with:password',
             ]);
 
-            $password = Request::get('password') ? Hash::make(Request::get('password')) : $user->password;
+            if (Request::get('password')) {
+                if (!Hash::check(Request::get('old_password'), $user->password)) {
+                    return response()->json([
+                        'message' => 'Old password is incorrect',
+                    ], 401);
+                }
+                $password = Hash::make(Request::get('password'));
+            }
 
             $user->fill([
                 'email' => Request::get('email') ?? $user->email,
                 'name' => Request::get('name') ?? $user->name,
-                'password' => $password,
+                'password' => $password ?? $user->password,
             ]);
             $user->save();
 
-            return request()->json(200, [
+            $response = [
                 'message' => 'User updated',
                 'user' => $user,
-            ]);
+                'password' => Request::get('password') ?? false,
+            ];
+
+            return response()->json($response, 200);
         } else {
             Request::validate([
                 'email' => 'required|email|unique:users',

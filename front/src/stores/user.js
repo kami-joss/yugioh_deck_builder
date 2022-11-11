@@ -31,6 +31,8 @@ export const useUserStore = defineStore("user", {
           api.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.token}`;
+
+          window.location.reload();
         })
         .catch((error) => {
           console.log(error);

@@ -1,6 +1,13 @@
 <template>
   <q-dialog v-model="state" persistent>
-    <q-spinner-hourglass color="amber-5" size="7rem" thickness="10" />
+    <span class="column items-center"> </span>
+
+    <q-card v-if="text" class="column items-center q-pa-md">
+      <p class="text-h6 text-center">{{ text }}</p>
+      <q-spinner-hourglass color="amber-5" size="7rem" thickness="10" />
+    </q-card>
+
+    <q-spinner-hourglass v-else color="amber-5" size="7rem" thickness="10" />
   </q-dialog>
 </template>
 
@@ -11,6 +18,10 @@ const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false,
+  },
+  text: {
+    type: String,
+    default: null,
   },
 });
 

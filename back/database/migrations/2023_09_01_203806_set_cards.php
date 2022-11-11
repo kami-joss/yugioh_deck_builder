@@ -15,7 +15,7 @@ return new class extends Migration
      * Run the migrations.
      *
      * @return void
-     * 
+     *
      */
     public function up()
     {
@@ -58,14 +58,14 @@ return new class extends Migration
             if (array_key_exists('card_images', $card)) {
                 foreach ($card['card_images'] as $image) {
                     $imageExtension = substr($image['image_url'], strrpos($image['image_url'], '.') + 1);
-                    $imageSmallExtension = substr($image['image_url_small'], strrpos($image['image_url_small'], '.') + 1);
+                    // $imageSmallExtension = substr($image['image_url_small'], strrpos($image['image_url_small'], '.') + 1);
 
-                    // $imageContent = file_get_contents($image['image_url']);
-                    $path = 'card_images' . DIRECTORY_SEPARATOR . $image['id'] . '.' . $imageSmallExtension;
-                    // Storage::put($path, $imageContent);
+                    $imageContent = file_get_contents($image['image_url']);
+                    $path = 'card_images' . DIRECTORY_SEPARATOR . $image['id'] . '.' . $imageExtension;
+                    Storage::put($path, $imageContent);
 
                     // $imageSmallContent = file_get_contents($image['image_url_small']);
-                    $pathSmall = 'card_images' . DIRECTORY_SEPARATOR . $image['id'] . '_small' . '.' . $imageSmallExtension;
+                    // $pathSmall = 'card_images' . DIRECTORY_SEPARATOR . $image['id'] . '_small' . '.' . $imageSmallExtension;
                     // Storage::put($pathSmall, $imageSmallContent);
 
                     $newImage = Image::create([
@@ -76,16 +76,16 @@ return new class extends Migration
                         'type' => 'card_image',
                     ]);
 
-                    $newImageSmall = Image::create([
-                        'api_id' => $image['id'] ?? null,
-                        'path' => $pathSmall,
-                        'name' => $image['id'] . '_small',
-                        'extension' => $imageSmallExtension,
-                        'type' => 'card_image_small',
-                    ]);
+                    // $newImageSmall = Image::create([
+                    //     'api_id' => $image['id'] ?? null,
+                    //     'path' => $pathSmall,
+                    //     'name' => $image['id'] . '_small',
+                    //     'extension' => $imageSmallExtension,
+                    //     'type' => 'card_image_small',
+                    // ]);
 
                     $newCard->image_id = $newImage->id;
-                    $newCard->image_small_id = $newImageSmall->id;
+                    // $newCard->image_small_id = $newImageSmall->id;
                     $newCard->save();
                 }
             }

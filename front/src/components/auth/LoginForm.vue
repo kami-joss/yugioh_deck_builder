@@ -14,6 +14,7 @@ import { ref } from "vue";
 import { api } from "boot/axios";
 import { useUserStore } from "src/stores/user";
 import { useRoute, useRouter } from "vue-router";
+import axios from "axios";
 
 export default {
   setup() {
@@ -30,9 +31,7 @@ export default {
       password,
       router,
       onSubmit() {
-        userStore.login(email.value, password.value).then(() => {
-          router.back();
-        });
+        userStore.login(email.value, password.value);
       },
     };
   },

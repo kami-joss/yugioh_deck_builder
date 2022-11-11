@@ -33,24 +33,36 @@
           <div v-if="!userStore.user">
             <a href="#/login"> Se connecter </a>
           </div>
-          <div v-else>
-            <q-avatar size="xl" text-color="white" color="primary">
-              <img :src="userStore.user?.photoURL" />
-              <q-menu transition-show="flip-right" transition-hide="flip-left">
-                <q-list style="min-width: 100px">
-                  <q-item
-                    clickable
-                    tag="a"
-                    :href="`#/user/${userStore.getUser.id}`"
-                  >
-                    <q-item-section>Manage</q-item-section>
-                  </q-item>
-                  <q-item clickable @click="userStore.logout()">
-                    <q-item-section>Loggout</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-avatar>
+          <div v-else class="row">
+            <q-btn
+              flat
+              dense
+              icon="favorite"
+              aria-label="My favorites"
+              label="favorites"
+            />
+            <div>
+              <q-avatar size="xl" text-color="white" color="primary">
+                <img :src="userStore.user?.photoURL" />
+                <q-menu
+                  transition-show="flip-right"
+                  transition-hide="flip-left"
+                >
+                  <q-list style="min-width: 100px">
+                    <q-item
+                      clickable
+                      tag="a"
+                      :href="`#/user/${userStore.getUser.id}`"
+                    >
+                      <q-item-section>Manage</q-item-section>
+                    </q-item>
+                    <q-item clickable @click="userStore.logout()">
+                      <q-item-section>Loggout</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-avatar>
+            </div>
           </div>
         </q-toolbar>
       </q-header>
