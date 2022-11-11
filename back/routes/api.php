@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
     Route::put('/{user}', [UsersController::class, 'update']);
     Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
     Route::delete('/{user}/favorites', [UsersController::class, 'removeFavorite']);
+    Route::delete('/{user}', [UsersController::class, 'destroy']);
 });
 
 

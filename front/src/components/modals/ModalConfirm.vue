@@ -6,6 +6,8 @@
         <span class="q-ml-sm"> {{ text }}</span>
       </q-card-section>
 
+      <slot />
+
       <q-card-actions align="right">
         <q-btn
           flat
@@ -14,13 +16,7 @@
           v-close-popup
           @click="emits('cancel')"
         />
-        <q-btn
-          flat
-          label="Ok"
-          color="primary"
-          v-close-popup
-          @click="emits('confirm')"
-        />
+        <q-btn flat label="Ok" color="primary" @click="emits('confirm')" />
       </q-card-actions>
     </q-card>
   </q-dialog>

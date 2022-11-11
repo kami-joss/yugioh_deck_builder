@@ -31,10 +31,29 @@
         label="New password confirmation"
         filled
       />
-      <div class="row justify-center items-center">
-        <q-btn color="primary" label="Save" type="submit" />
-      </div>
     </q-form>
+
+    <p class="text-negative cursor-pointer" @click="modalDelete = true">
+      Close my account
+    </p>
+
+    <div class="row justify-center items-center">
+      <q-btn color="primary" label="Save" type="submit" />
+    </div>
+
+    <modal-confirm
+      v-model="modalDelete"
+      text="Warn ! You will delete your account. This action is not reversible."
+      @confirm="deleteUser"
+    >
+      <p class="bold">Input your password for continue</p>
+      <q-input
+        v-model="password_delete"
+        label="Password"
+        filled
+        type="password"
+      />
+    </modal-confirm>
   </q-card>
 </template>
 
@@ -44,8 +63,11 @@ import { api } from "boot/axios";
 import { useQuasar } from "quasar";
 import { pickBy } from "lodash";
 import { useUserStore } from "src/stores/user";
+import ModalConfirm from "src/components/modals/ModalConfirm.vue";
+import { useRouter } from "vue-router";
 
 const $q = useQuasar();
+const router = useRouter();
 
 const props = defineProps({
   user: {
@@ -83,5 +105,26 @@ const onSubmit = () => {
       emits("update:password");
     }
   });
+};
+
+const password_delete = ref("");
+const modalDelete = ref(false);
+const deleteUser = () => {
+  api
+    .delete(`/users/${props.user.id}`, {
+      data: {
+        password: password_delete.value,
+      },
+    })
+    .then(() => {
+      $q.notify({
+        message: "Your account has been closed.",
+        color: "positive",
+        position: "top",
+        icon: "check",
+      });
+      userStore.clearUser();
+      router.replace("/");
+    });
 };
 </script>

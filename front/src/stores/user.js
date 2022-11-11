@@ -54,6 +54,13 @@ export const useUserStore = defineStore("user", {
     async setFavorites(favorites) {
       this.user.favorites = favorites;
     },
-    async fetchUser() {},
+    clearUser() {
+      this.user = null;
+      this.token = null;
+
+      api.defaults.headers.common["Authorization"] = ``;
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    },
   },
 });

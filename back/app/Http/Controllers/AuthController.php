@@ -19,7 +19,7 @@ class AuthController extends BaseController
      * Handle an authentication attempt.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     // public function authenticate(Request $request)
     // {
@@ -47,6 +47,12 @@ class AuthController extends BaseController
         ]);
 
         $user = User::where('email', $request->email)->with('favorites')->first();
+
+        if(!$user) {
+            return response()->json([
+                'message' => 'User not found.',
+            ], 404);
+        }
 
         if ($user && !Hash::check($request->password, $user->password)) {
             return response()->json(

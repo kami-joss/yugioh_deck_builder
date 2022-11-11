@@ -192,4 +192,40 @@ class UsersController extends BaseController
             ]);
         }
     }
+
+    /**
+     * @param User $user
+     * Delete user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(User $user)
+    {
+        if (auth('sanctum')->user()) {
+            if ($user->cannot('delete', $user)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            Request::validate([
+                'password' => 'required',
+            ]);
+
+            if (!Hash::check(Request::get('password'), $user->password)) {
+                return response()->json([
+                    'message' => 'Password is incorrect',
+                ], 401);
+            }
+
+            $user->tokens()->delete();
+            $user->decks->map(function ($deck) {
+                $deck->cards()->detach();
+            });
+            $user->decks()->delete();
+            $user->favorites()->detach();
+            $user->delete();
+
+            return response()->json('User deleted', 200);
+        }
+
+        return response()->json('No user auth', 403);
+    }
 }
