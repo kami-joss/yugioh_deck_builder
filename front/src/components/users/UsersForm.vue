@@ -72,7 +72,6 @@ import { pickBy } from "lodash";
 import { useUserStore } from "src/stores/user";
 import ModalConfirm from "src/components/modals/ModalConfirm.vue";
 import { useRouter } from "vue-router";
-import { CLOSING } from "ws";
 
 const uploadAvatar = (files) => {
   const file_path = files[0];

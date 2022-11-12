@@ -14,7 +14,13 @@
         label="Forbidden"
       />
     </q-card-section>
-    <img src="https://cdn.quasar.dev/img/parallax2.jpg" />
+    <div class="image_container">
+      <q-img
+        :src="deck.image_path"
+        spinner-color="black"
+        style="width: 100%; position: relative"
+      />
+    </div>
   </q-card>
 </template>
 
@@ -31,3 +37,13 @@ const props = defineProps({
   },
 });
 </script>
+
+<style scoped lang="scss">
+.image_container {
+  max-height: 200px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>

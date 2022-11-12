@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Deck extends Model
 {
@@ -23,6 +24,16 @@ class Deck extends Model
         'updated_at',
     ];
 
+    protected $appends = [
+        'image_path',
+    ];
+
+    public function getImagePathAttribute()
+    {
+        return asset(Storage::url($this->image?->path));
+    }
+
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -37,6 +48,7 @@ class Deck extends Model
     {
         return $this->belongsToMany(Card::class, 'decks_cards');
     }
+
 
     public function scopePublic($query)
     {

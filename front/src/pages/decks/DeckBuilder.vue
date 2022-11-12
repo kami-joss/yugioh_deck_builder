@@ -228,6 +228,7 @@ const saveDeck = (deckOptions) => {
     api
       .post("/decks", {
         ...deckOptions,
+        image_id: deck.main[0]?.id,
         cards,
         public: deckOptions.isPublic,
         user_id: userStore.user.id,

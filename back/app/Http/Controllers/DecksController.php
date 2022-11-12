@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Deck;
 use App\Models\User;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class DecksController extends Controller
@@ -91,12 +92,14 @@ class DecksController extends Controller
             'public' => 'required',
         ]);
 
+        $card_image_id = request()->image_id ?? Image::where('name', 'card_verso.jpg')->first()->id;
+
         if (!$deck) {
             $deck = Deck::create([
                 'name' => request()->name,
                 'description' => request()->description,
                 'user_id' => request()->user_id,
-                'image_id' => request()->image_id,
+                'image_id' => $card_image_id,
                 'public' => request()->public,
             ]);
             $deck->cards()->attach(request()->cards);
@@ -107,7 +110,7 @@ class DecksController extends Controller
             'name' => request()->name,
             'description' => request()->description,
             'user_id' => request()->user_id,
-            'image_id' => request()->image_id,
+            'image_id' => $card_image_id,
             'public' => request()->public,
         ]);
         $deck->cards()->detach();

@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     public function getImagePathAttribute()
     {
-        return asset(Storage::url($this->image->path));
+        return asset(Storage::url($this->image?->path));
     }
 
     public function favorites()
