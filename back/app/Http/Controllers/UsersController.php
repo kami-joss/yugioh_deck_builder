@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Deck;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -141,10 +142,14 @@ class UsersController extends BaseController
             }
         }
 
+
+        $avatar_id = request()->image_id ?? Image::where('name', 'default_avatar.jpg')->first()?->id;
+
         if ($user) {
             Request::validate([
                 'email' => 'email|unique:users,email,' . $user->id,
-                'name' => 'unique:users,name,' . $user->id,
+                'name' => 'unique:users,name,' . $user->id . '|max:32',
+                'image_id' => 'nullable|integer',
                 'old_password' => 'nullable|required_with:password,',
                 'password' => 'min:4|same:password_confirmation|nullable',
                 'password_confirmation' => 'min:4|same:password|required_with:password',
@@ -163,6 +168,7 @@ class UsersController extends BaseController
                 'email' => Request::get('email') ?? $user->email,
                 'name' => Request::get('name') ?? $user->name,
                 'password' => $password ?? $user->password,
+                'image_id' => Request::get('image_id') ?? $user->image_id,
             ]);
             $user->save();
 
@@ -176,15 +182,17 @@ class UsersController extends BaseController
         } else {
             Request::validate([
                 'email' => 'required|email|unique:users',
-                'password' => 'required|min:4|must_match:password_confirmation',
-                'password_confirmation' => 'required|min:4|must_match:password',
-                'name' => 'required|unique:users',
+                'password' => 'min:4|same:password_confirmation|nullable',
+                'password_confirmation' => 'min:4|same:password|required_with:password',
+                'name' => 'required|unique:users|max:32',
+                'image_id' => 'nullable|integer',
             ]);
 
             $user = User::create([
                 'email' => Request::get('email'),
                 'password' => Hash::make(Request::get('password')),
                 'name' => Request::get('name'),
+                'image_id' => $avatar_id,
             ]);
             return request()->json(201, [
                 'message' => 'User created successfully',
@@ -229,7 +237,8 @@ class UsersController extends BaseController
         return response()->json('No user auth', 403);
     }
 
-    public function updateAvatar(User $user) {
+    public function updateAvatar(User $user)
+    {
         Request::validate([
             'image_id' => 'required|integer',
         ]);
@@ -237,6 +246,6 @@ class UsersController extends BaseController
         $user->image_id = request()->image_id;
         $user->save();
 
-        return response()->json($user->load(['favorites','image']), 200);
+        return response()->json($user->load(['favorites', 'image']), 200);
     }
 }

@@ -41,10 +41,8 @@ export default route(function (/* { store, ssrContext } */) {
     const LoggedIn = userStore.getUser;
 
     if (
-      // make sure the user is authenticated
-      LoggedIn &&
-      // ❗️ Avoid an infinite redirect
-      to.path === "/login"
+      (LoggedIn && to.path === "/login") ||
+      (LoggedIn && to.path === "/register")
     ) {
       // redirect the user to the login page
       return "/";

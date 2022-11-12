@@ -7,6 +7,7 @@
     accept=".jpg, .jpeg, .png"
     :hide-upload-btn="hiddenBtn"
     @added="emits('added', $event)"
+    @removed="emits('removed', $event)"
     @rejected="onRejected"
   />
 </template>

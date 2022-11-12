@@ -1,20 +1,37 @@
 <template>
-  <div class="container">
-    <login-form />
+  <div>
+    <q-btn
+      label="Back home"
+      icon="arrow_back"
+      class="q-ma-md"
+      flat
+      @click="router.push('/')"
+    />
+    <div class="container">
+      <login-form />
+      <div class="row justify-center items-center q-ma-md">
+        <p>
+          Not member yet ?
+          <a href="#/register" class="text-white"> Register </a>
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import axios from "axios";
 import LoginForm from "components/auth/LoginForm.vue";
+import { useRouter } from "vue-router";
 
 export default {
   components: {
     LoginForm,
   },
   setup() {
-    return {};
+    const router = useRouter();
+    return {
+      router,
+    };
   },
 };
 </script>
