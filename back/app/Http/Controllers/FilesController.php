@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Image;
+use App\Models\Files;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class ImagesController extends Controller
+class FilesController extends Controller
 {
-    //
+    public function index()
+    {
+        return view('welcome');
+    }
+
     public function upload(Request $request)
     {
         $request->validate([
@@ -22,23 +26,13 @@ class ImagesController extends Controller
             switch ($request->type) {
                 case 'avatar':
                     $fileName = 'image_' . time() . '.' . $original_filename;
-                    Storage::putFileAs('public' . DIRECTORY_SEPARATOR . 'avatars', $request->file_path, $fileName);
-                    $absolute_path = url(Storage::url('public' . DIRECTORY_SEPARATOR . 'avatars' . DIRECTORY_SEPARATOR . $fileName));
-                    $path = 'avatars' . DIRECTORY_SEPARATOR . $fileName;
+                    Storage::putFileAs('public/avatars', $request->file_path, $fileName);
+                    $paths[] = url(Storage::url('public/avatars/' . $fileName));
                     break;
             }
-
-            $image = Image::create([
-                'path' => $path,
-                'name' => $fileName,
-                'extension' => $request->file_path->extension(),
-                'type' => $request->type,
-                'size' => $request->file_path->getSize(),
-            ]);
-
             return response()->json([
                 'message' => 'File uploaded successfully',
-                'image' => $image
+                'data' => $paths
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

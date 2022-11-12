@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-avatar size="xl" text-color="white" color="primary">
-      <img :src="userStore.user?.photoURL" />
+      <img :src="userStore.user?.image_path" />
       <q-menu transition-show="flip-right" transition-hide="flip-left">
         <q-list style="min-width: 100px">
           <q-item clickable tag="a" :href="`#/user/${userStore.getUser.id}`">

@@ -50,6 +50,7 @@ export const useUserStore = defineStore("user", {
     },
     async setUser(user) {
       this.user = user;
+      localStorage.setItem("user", JSON.stringify(user));
     },
     async setFavorites(favorites) {
       this.user.favorites = favorites;

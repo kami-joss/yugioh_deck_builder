@@ -228,4 +228,15 @@ class UsersController extends BaseController
 
         return response()->json('No user auth', 403);
     }
+
+    public function updateAvatar(User $user) {
+        Request::validate([
+            'image_id' => 'required|integer',
+        ]);
+
+        $user->image_id = request()->image_id;
+        $user->save();
+
+        return response()->json($user->load(['favorites','image']), 200);
+    }
 }

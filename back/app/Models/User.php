@@ -3,11 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
@@ -34,6 +35,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'image_path',
+    ];
+
     /**
      * The attributes that should be cast.
      *
@@ -43,11 +48,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function favorites() {
+    public function getImagePathAttribute()
+    {
+        return asset(Storage::url($this->image->path));
+    }
+
+    public function favorites()
+    {
         return $this->belongsToMany(Deck::class, 'users_favorites', 'user_id', 'deck_id');
     }
 
-    public function decks() {
+    public function decks()
+    {
         return $this->hasMany(Deck::class);
+    }
+    public function image()
+    {
+        return $this->belongsTo(Image::class);
     }
 }

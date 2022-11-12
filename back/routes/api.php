@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CardsController;
 use App\Http\Controllers\DecksController;
+use App\Http\Controllers\FilesController;
+use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\UsersController;
 
 /*
@@ -38,6 +40,7 @@ Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
     Route::get('/{user}/favorites', [UsersController::class, 'favorites']);
     Route::put('/{user}', [UsersController::class, 'update']);
     Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
+    Route::post('/{user}/avatar', [UsersController::class, 'updateAvatar']);
     Route::delete('/{user}/favorites', [UsersController::class, 'removeFavorite']);
     Route::delete('/{user}', [UsersController::class, 'destroy']);
 });
@@ -62,3 +65,5 @@ Route::middleware('auth:sanctum')->prefix('/decks')->group(function() {
     route::put('/{deck}', [DecksController::class, 'update']);
     route::delete('/{deck}', [DecksController::class, 'delete']);
 });
+
+Route::post('/images/upload', [ImagesController::class, 'upload']);

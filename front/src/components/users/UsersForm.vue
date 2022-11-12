@@ -3,6 +3,14 @@
     <p class="text-h6">
       {{ user.id ? "Account " + user.name : "Create User" }}
     </p>
+    <q-uploader
+      style="max-width: 300px"
+      label="Pick an image"
+      :factory="uploadAvatar"
+      max-files="1"
+      accept=".jpg, .jpeg, .png"
+      @rejected="onRejected"
+    />
     <q-form @submit="onSubmit">
       <q-input
         v-model="form.name"
@@ -31,15 +39,14 @@
         label="New password confirmation"
         filled
       />
+      <div class="row justify-center items-center">
+        <q-btn color="primary" label="Save" type="submit" />
+      </div>
     </q-form>
 
     <p class="text-negative cursor-pointer" @click="modalDelete = true">
       Close my account
     </p>
-
-    <div class="row justify-center items-center">
-      <q-btn color="primary" label="Save" type="submit" />
-    </div>
 
     <modal-confirm
       v-model="modalDelete"
@@ -65,20 +72,59 @@ import { pickBy } from "lodash";
 import { useUserStore } from "src/stores/user";
 import ModalConfirm from "src/components/modals/ModalConfirm.vue";
 import { useRouter } from "vue-router";
+import { CLOSING } from "ws";
+
+const uploadAvatar = (files) => {
+  const file_path = files[0];
+  const fileData = new FormData();
+
+  fileData.append("file_path", file_path);
+  fileData.append("type", "avatar");
+
+  api
+    .post("/images/upload", fileData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res) => {
+      api
+        .post(`users/${user.id}/avatar`, { image_id: res.data.image.id })
+        .then((res) => {
+          userStore.setUser(res.data);
+          $q.notify({
+            message: "Avatar uploaded",
+            color: "positive",
+            icon: "cloud_done",
+          });
+        });
+    });
+};
+
+const onRejected = () => {
+  $q.notify({
+    message: "File rejected. Format accepted : .jpg, .jpeg, .png",
+    color: "negative",
+    icon: "cloud_done",
+  });
+};
 
 const $q = useQuasar();
 const router = useRouter();
+const userStore = useUserStore();
 
-const props = defineProps({
-  user: {
-    type: Object,
-    required: true,
-  },
-});
+const user = reactive(userStore.user);
+
+// const props = defineProps({
+//   user: {
+//     type: Object,
+//     required: true,
+//   },
+// });
 
 const form = reactive({
-  name: props.user.name,
-  email: props.user.email,
+  name: user.name,
+  email: user.email,
   old_password: "",
   password: "",
   password_confirmation: "",
@@ -86,12 +132,10 @@ const form = reactive({
 
 const emits = defineEmits(["update:password"]);
 
-const userStore = useUserStore();
-
 const onSubmit = () => {
   const formFormatted = pickBy(form, (val) => val != "");
 
-  api.put(`/users/${props.user.id}`, formFormatted).then((response) => {
+  api.put(`/users/${user.id}`, formFormatted).then((response) => {
     $q.notify({
       message: "Your profile has been updated.",
       color: "positive",
@@ -111,7 +155,7 @@ const password_delete = ref("");
 const modalDelete = ref(false);
 const deleteUser = () => {
   api
-    .delete(`/users/${props.user.id}`, {
+    .delete(`/users/${user.id}`, {
       data: {
         password: password_delete.value,
       },
