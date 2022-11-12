@@ -30,6 +30,7 @@
 import { onMounted, reactive, ref, watch } from "vue";
 import { api } from "boot/axios";
 import { useRoute, useRouter } from "vue-router";
+import { pickBy } from "lodash";
 
 import FiltersCards from "../components/forms/filters/FiltersCards.vue";
 import YgoCard from "../components/cards/YgoCard.vue";
@@ -37,15 +38,13 @@ import YgoCard from "../components/cards/YgoCard.vue";
 const router = useRouter();
 const route = useRoute();
 
-const current_page = ref(1);
+const current_page = ref(route.query.page ?? 1);
 const cards = ref([]);
 
 const getCards = async (params) => {
-  const queryParams = route.query;
   await api
     .get("/cards", {
       params: {
-        ...queryParams,
         ...params,
       },
     })
@@ -77,7 +76,6 @@ watch(current_page, (val) => {
 const onSearch = (form) => {
   router.push({
     query: {
-      ...route.query,
       ...form,
     },
   });

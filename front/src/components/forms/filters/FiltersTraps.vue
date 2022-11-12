@@ -1,6 +1,6 @@
 <template>
   <div>
-    <RacesFilter v-model="form.races" :racesList="trapRaces" :label="'Types'" />
+    <RacesFilter v-model="form.trap" :racesList="trapRaces" :label="'Types'" />
   </div>
 </template>
 

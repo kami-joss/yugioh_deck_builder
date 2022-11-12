@@ -1,7 +1,7 @@
 <template>
   <div>
     <RacesFilter
-      v-model="form.races"
+      v-model="form.spell"
       :racesList="spellRaces"
       :label="'Types'"
     />

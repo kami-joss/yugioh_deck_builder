@@ -1,6 +1,6 @@
 <template>
   <q-card class="q-px-md q-py-md filters-container">
-    <q-input v-model="monstersForm.name" outlined dense filled :debounce="1000">
+    <q-input v-model="search" outlined dense filled :debounce="1000">
       <template v-slot:append>
         <q-btn flat rounded icon="search" @click="onSearch" />
       </template>
@@ -71,6 +71,7 @@ import FiltersMonsters from "./FiltersMonsters.vue";
 import FiltersSpells from "./FiltersSpells.vue";
 import FiltersTraps from "./FiltersTraps.vue";
 import { spellRaces, trapRaces } from "../../../utils/cardUtils";
+import { pickBy } from "lodash";
 
 const route = useRoute();
 const emits = defineEmits(["search"]);
@@ -95,35 +96,44 @@ const onSearch = () => {
     ...monstersForm.value,
     ...spellsForm.value,
     ...trapsForm.value,
-    races: monstersForm.value.races.concat(
-      spellsForm.value.races,
-      trapsForm.value.races
-    ),
+    races: monstersForm.value.races,
+    trap: trapsForm.value.trap,
+    spell: spellsForm.value.spell,
+    name: search.value,
   };
 
-  emits("search", form);
+  const formFormatted = pickBy(
+    form,
+    (value) => value !== "" && value !== null && value.length > 0
+  );
+
+  emits("search", formFormatted);
 };
 
+const search = ref(null);
+
 const monstersForm = ref({
-  name: "",
   types: route.query.types ?? [],
   attributes: route.query.attributes ?? [],
   races: route.query.races ?? [],
-  levels: route.query.levels ?? { min: 0, max: 12 },
-  atk: route.query.atk ?? { min: 0, max: 0 },
-  def: route.query.def ?? { min: 0, max: 0 },
+  atkMax: route.query.atkMax ?? null,
+  atkMin: route.query.atkMin ?? null,
+  defMax: route.query.defMax ?? null,
+  defMin: route.query.defMin ?? null,
+  levelMax: route.query.levelMax ?? null,
+  levelMin: route.query.levelMin ?? null,
 });
 
 const spellsForm = ref({
-  races: route.query.races ?? [],
+  spell: route.query.spell ?? [],
 });
 
 const trapsForm = ref({
-  races: route.query.races ?? [],
+  trap: route.query.trap ?? [],
 });
 
 watch(
-  () => monstersForm.value.name,
+  () => search.value,
   () => {
     onSearch();
   }

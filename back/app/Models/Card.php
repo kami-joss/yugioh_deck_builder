@@ -71,7 +71,7 @@ class Card extends Model
             });
         });
 
-        $query->when($filters['attributes'] ?? false, function ($query, $attributes) use ($filters) {  
+        $query->when($filters['attributes'] ?? false, function ($query, $attributes) use ($filters) {
             $query->where(function ($query) use ($attributes, $filters) {
                 $query->whereIn('attribute', $attributes);
                 if($filters['types']) {
@@ -90,7 +90,58 @@ class Card extends Model
             });
         });
 
+        $query->when($filters['spell'] ?? false, function ($query, $spell) use ($filters) {
+            $query->where(function ($query) use ($spell, $filters) {
+                $query->whereIn('race', $spell);
+            });
+        });
 
+        $query->when($filters['trap'] ?? false, function ($query, $trap) use ($filters) {
+            $query->where(function ($query) use ($trap, $filters) {
+                $query->whereIn('race', $trap);
+            });
+        });
+
+        $query->when($filters['atkMax'] ?? false, function ($query, $atkMax) {
+            $query->where('atk', '<=', (int) $atkMax);
+        });
+
+        $query->when($filters['atkMin'] ?? false, function ($query, $atkMin) {
+            $query->where('atk', '>=', (int) $atkMin);
+        });
+
+        $query->when($filters['defMax'] ?? false, function ($query, $defMax) {
+            $query->where('def', '<=', $defMax);
+        });
+
+        $query->when($filters['defMin'] ?? false, function ($query, $defMin) {
+            $query->where('def', '>=', $defMin);
+        });
+
+        $query->when($filters['levelMax'] ?? false, function ($query, $levelMax) {
+            $query->where('level', '<=', (int) $levelMax);
+        });
+
+        $query->when($filters['levelMin'] ?? false, function ($query, $levelMin) {
+            $query->where('level', '>=', (int) $levelMin);
+        });
+
+        $query->when($filters['linkvalMax'] ?? false, function ($query, $linkvalMax) {
+            $query->where('linkval', '<=', $linkvalMax);
+        });
+
+        $query->when($filters['linkvalMin'] ?? false, function ($query, $linkvalMin) {
+            $query->where('linkval', '>=', $linkvalMin);
+        });
+
+        $query->when($filters['scaleMax'] ?? false, function ($query, $scaleMax) {
+            $query->where('scale', '<=', $scaleMax);
+        });
+
+        $query->when($filters['scaleMin'] ?? false, function ($query, $scaleMin) {
+            $query->where('scale', '>=', $scaleMin);
+        });
         // dd($query->toSql());
     }
+
 }

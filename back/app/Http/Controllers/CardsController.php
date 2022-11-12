@@ -13,7 +13,24 @@ class CardsController extends Controller
      */
     public function index()
     {
-        $cards = Card::with('image_small')->filtered(request()->only('name', 'types', 'attributes', 'races'))->paginate(30)->withQueryString();
+        $races = array_merge(request()->races ?? [], request()->spell ?? [], request()->trap ?? []);
+        $filters = request()->only(
+            'name',
+            'types',
+            'attributes',
+            'levelMax',
+            'levelMin',
+            'atkMax',
+            'atkMin',
+            'defMax',
+            'defMin',
+            'linkvalMax',
+            'linkvalMin',
+        );
+        $filters['races'] = $races;
+
+
+        $cards = Card::with('image_small')->filtered($filters)->paginate(30)->withQueryString();
         return response()->json($cards, 200);
     }
 
