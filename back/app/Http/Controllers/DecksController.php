@@ -42,7 +42,7 @@ class DecksController extends Controller
 
     public function store()
     {
-        $this->handle();
+        return $this->handle();
     }
 
     public function update(Deck $deck)
@@ -83,6 +83,7 @@ class DecksController extends Controller
 
     public function handle(Deck $deck = null)
     {
+
         request()->validate([
             'name' => 'required',
             'description' => 'max:255',
@@ -90,6 +91,7 @@ class DecksController extends Controller
             'cards' => 'required',
             'image_id' => 'nullable',
             'public' => 'required',
+            'illegal' => 'required',
         ]);
 
         $card_image_id = request()->image_id ?? Image::where('name', 'card_verso.jpg')->first()->id;
@@ -101,6 +103,7 @@ class DecksController extends Controller
                 'user_id' => request()->user_id,
                 'image_id' => $card_image_id,
                 'public' => request()->public,
+                'illegal' => request()->illegal,
             ]);
             $deck->cards()->attach(request()->cards);
             return response()->json($deck, 201);
@@ -112,9 +115,12 @@ class DecksController extends Controller
             'user_id' => request()->user_id,
             'image_id' => $card_image_id,
             'public' => request()->public,
+            'illegal' => request()->illegal,
         ]);
         $deck->cards()->detach();
         $deck->cards()->attach(request()->cards);
+
+        return response()->json($deck, 200);
     }
 
     public function destroy(Deck $deck)

@@ -4,7 +4,7 @@
       v-for="deck in decks"
       :deck="deck"
       :key="deck.id"
-      :buttons="['delete']"
+      :buttons="deck.user.id == userStore.getUser.id ? ['delete'] : []"
       class="col-sm-5 col-md-2 col-lg-1"
     />
   </div>
@@ -12,6 +12,7 @@
 
 <script setup>
 import { onMounted, reactive, ref, watch, defineProps } from "vue";
+import { useUserStore } from "src/stores/user";
 import DeckCover from "src/components/decks/DeckCover";
 
 const props = defineProps({
@@ -20,4 +21,6 @@ const props = defineProps({
     required: true,
   },
 });
+
+const userStore = useUserStore();
 </script>

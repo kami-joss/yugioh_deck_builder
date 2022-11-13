@@ -178,13 +178,6 @@ const onClone = async (deckOptions) => {
     });
 };
 
-watch(
-  () => route.params.id,
-  () => {
-    getDeck();
-  }
-);
-
 const modalDelete = ref(false);
 const deleteDeck = async () => {
   await api.delete(`/decks/${route.params.id}`).then((res) => {
@@ -198,6 +191,13 @@ const deleteDeck = async () => {
     router.replace("/decks");
   });
 };
+
+watch(
+  () => route.params.id,
+  () => {
+    getDeck();
+  }
+);
 
 onMounted(async () => {
   await getDeck();

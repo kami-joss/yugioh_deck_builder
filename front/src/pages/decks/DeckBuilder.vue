@@ -9,7 +9,7 @@
           icon="save"
           size="md"
           color="primary"
-          @click="modalSaveDeck = true"
+          @click="onSave"
         />
         <q-btn
           label="Reset"
@@ -46,7 +46,6 @@
         class="col-4"
         @click:card="addCardToDeck"
         @load:scroll="onLoad"
-        @hover:card="setCardShowing"
       />
 
       <q-card class="column col gap-1 gt-md">
@@ -104,7 +103,6 @@
             :cards="cards.data"
             class="col-12 col-lg-4"
             @load:scroll="onLoad"
-            @click:card="setCardShowing"
           />
         </q-tab-panel>
         <q-tab-panel name="deck">
@@ -159,7 +157,25 @@
       :name="deck.data?.name"
       :isPublic="deck.data?.public ? true : false"
       @save="saveDeck"
-    />
+    >
+      <template v-if="warnings.length > 0" #beforeForm>
+        <div>
+          <div class="row justify-center q-ma-md">
+            <q-icon name="warning" color="red-5" size="xl" />
+          </div>
+          <p>
+            <span class="text-red-5">Warning:</span> Your deck is not valid. You can save it anyway, but it will not be able to be used in a duel.
+          </p>
+          <p>
+            <ul>
+              <li v-for="(warn, index) in warnings" :key="index">
+                {{ warn.message }}
+              </li>
+            </ul>
+          </p>
+        </div>
+      </template>
+    </modal-save-deck>
 
     <modal-confirm
       v-model="modalWarnReset"
@@ -178,6 +194,8 @@ import { api } from "boot/axios";
 import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
 import { useQuasar, Platform } from "quasar";
 import { useUserStore } from "src/stores/user";
+import { useCardStore } from "src/stores/card";
+
 import FiltersCards from "src/components/forms/filters/FiltersCards.vue";
 import YgoCard from "src/components/cards/YgoCard.vue";
 import CardsList from "src/components/cards/CardsList.vue";
@@ -186,35 +204,57 @@ import FullYgoCard from "src/components/cards/FullYgoCard.vue";
 import ModalYgoCard from "src/components/modals/ModalYgoCard.vue";
 import ModalSaveDeck from "src/components/modals/ModalSaveDeck.vue";
 import ModalConfirm from "src/components/modals/ModalConfirm.vue";
+import ModalSpinner from "src/components/modals/ModalSpinner.vue";
 
 import { isExtraDeck } from "src/utils/cardUtils";
-import ModalSpinner from "src/components/modals/ModalSpinner.vue";
 
 const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
 const $q = useQuasar();
+const cardStore = useCardStore();
+
 
 const formType = ref(route.params.id ? "edit" : "create");
-
 const current_page = ref(1);
 const cards = ref([]);
+const warnings = ref([]);
 const deck = reactive({
   main: [],
   extra: [],
   side: [],
   data: null,
 });
-const cardShowing = ref(null);
+const cardShowing = ref(cardStore);
 const tab = ref("card");
 
 const modalFilters = ref(false);
 const modalCard = ref(false);
-
-const modalSaveDeck = ref(false);
-
+const modalSaveDeck = ref(true);
 const waitingApi = ref(false);
+
+
+cardStore.$subscribe((state) => {
+  cardShowing.value = state.payload.card;
+});
+
+
+const onSave = () => {
+  if (deck.main.length < 40 && !warnings.value.find((warn) => warn.id === "main")) {
+    warnings.value = [
+      ...warnings.value,
+      {
+        id: "main",
+        message: "Main deck must have at least 40 cards",
+      },
+    ]
+  } else if(deck.main.length >= 40) {
+    warnings.value = warnings.value.filter(warn => warn.id != "main");
+  }
+  modalSaveDeck.value = true;
+}
+
 
 const saveDeck = (deckOptions) => {
   waitingApi.value = true;
@@ -232,10 +272,11 @@ const saveDeck = (deckOptions) => {
         cards,
         public: deckOptions.isPublic,
         user_id: userStore.user.id,
+        illegal: warnings.value.length > 0,
       })
       .then((res) => {
         waitingApi.value = false;
-        window.location.reload();
+        router.push(`/decks/${res.data.id}`);
         $q.notify({
           message: "Deck saved",
           color: "positive",
@@ -260,6 +301,7 @@ const saveDeck = (deckOptions) => {
         cards,
         public: deckOptions.isPublic,
         user_id: userStore.user.id,
+        illegal: warnings.value.length > 0,
       })
       .then((res) => {
         waitingApi.value = false;
@@ -371,11 +413,27 @@ const addCardToDeck = ({ card, quantity }) => {
     if (quantity + copies > 3) {
       $q.notify({
         message: `You can't have more than 3 of the same card in your deck. Number in deck: ${copies}`,
-        color: "amber-6",
+        color: "negative",
         position: "top",
-        icon: "warning",
+        icon: "block",
       });
     } else {
+      if (copies + quantity > card.number_allowed) {
+        $q.notify({
+          message: `Warn ! You have more than ${card.number_allowed} copies of this card. Number allowed : ${card.number_allowed}.`,
+          color: "warning",
+          position: "top",
+          icon: "warning",
+        });
+        warnings.value = [
+          ...warnings.value,
+          {
+            id: card.id,
+            message: `${card.name}. Number allowed : ${card.number_allowed}. In deck: ${copies + quantity}.`
+          },
+        ];
+      }
+
       if (isExtraDeck(card.type)) {
         for (let i = 0; i < quantity; i++) {
           deck.extra.push(card);
@@ -390,14 +448,6 @@ const addCardToDeck = ({ card, quantity }) => {
   }
 };
 
-const setCardShowing = (card) => {
-  cardShowing.value = card;
-
-  if ($q.platform.is.mobile) {
-    modalCard.value = true;
-  }
-};
-
 const removeCardFromDeck = (card) => {
   if (isExtraDeck(card.type)) {
     let index = deck.extra.indexOf(deck.extra.find((c) => c.id === card.id));
@@ -406,6 +456,13 @@ const removeCardFromDeck = (card) => {
     let index = deck.main.indexOf(deck.main.find((c) => c.id === card.id));
     deck.main.splice(index, 1);
   }
+
+  const copies = countCopyInDeck(card);
+
+  if (copies <= card.number_allowed) {
+    warnings.value = warnings.value.filter((w) => w.id !== card.id);
+  }
+
 };
 
 const onLoad = (index, done) => {

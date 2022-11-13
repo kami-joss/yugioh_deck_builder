@@ -14,7 +14,7 @@
           :cardSelected="cardSelected"
           class="col-3 col-md-2 cardSelected"
           @click="emits('click:card', { card, quantity: 1 })"
-          @hover:card="emits('hover:card', card)"
+          @hover:card="setCardStore"
         />
       </div>
       <template v-slot:loading>
@@ -29,11 +29,17 @@
 <script setup>
 import { onMounted, reactive, ref, watch, defineEmits, defineProps } from "vue";
 import { useQuasar, Platform } from "quasar";
+import { useCardStore } from "src/stores/card";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
 
 const $q = useQuasar();
 const cardSelected = ref(null);
+
+const store = useCardStore();
+const setCardStore = (card) => {
+  store.$patch({ card: card });
+};
 
 const props = defineProps({
   cards: {

@@ -2,6 +2,38 @@
   <div class="ygo-card" @click="handleClick" @mouseover="handleHover">
     <div style="width: 100%; position: relative">
       <q-img :src="card.image_path" spinner-color="black" />
+      <q-icon
+        v-if="card.number_allowed == 0"
+        name="block"
+        color="negative"
+        class="icon-forbidden"
+        size="2rem"
+      >
+        <q-tooltip
+          class="bg-red"
+          anchor="bottom middle"
+          self="top middle"
+          :offset="[10, 10]"
+        >
+          <strong> Forbidden </strong>
+        </q-tooltip>
+      </q-icon>
+      <div
+        v-if="card.number_allowed == 2 || card.number_allowed == 1"
+        class="icon-warning"
+      >
+        {{ card.number_allowed }}
+        <q-tooltip
+          class="bg-warning"
+          anchor="bottom middle"
+          self="top middle"
+          :offset="[10, 10]"
+        >
+          <strong>
+            {{ card.number_allowed == 1 ? "Limited" : "Semi-Limited" }}
+          </strong>
+        </q-tooltip>
+      </div>
     </div>
     <div v-if="label">
       <q-separator spaced dark />
@@ -60,9 +92,26 @@ watch(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ygo-card {
   cursor: pointer;
   max-height: 200px;
+}
+.icon-forbidden {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 1.5rem;
+}
+
+.icon-warning {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  color: white;
+  font-weight: bold;
+  border-radius: 500px;
+  background-color: $amber-6;
 }
 </style>

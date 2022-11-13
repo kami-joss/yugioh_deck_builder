@@ -1,14 +1,16 @@
 <template>
   <div class="container">
     <q-dialog v-model="state" class="modal">
+      <q-btn
+        round
+        size="md"
+        color="red-5"
+        icon="close"
+        class="lt-md btn-filter-close"
+      />
       <q-card class="modal-container" style="max-width: 400px; width: 100%">
-        <q-btn
-          round
-          size="md"
-          color="red-5"
-          icon="close"
-          class="lt-md btn-filter-close"
-        />
+        <p class="text-h6">Save</p>
+        <slot name="beforeForm" />
         <q-input
           v-model="form.name"
           ref="nameRef"
@@ -66,8 +68,8 @@ const state = ref(props.modelValue);
 
 const form = reactive({
   name: props.name,
-  description: toRef(props, "description"),
-  isPublic: toRef(props, "isPublic"),
+  description: props.description,
+  isPublic: props.isPublic,
 });
 
 const nameRef = ref(null);

@@ -19,9 +19,9 @@ class Deck extends Model
         'cards',
         'image_id',
         'public',
-        'deleted_at',
         'created_at',
         'updated_at',
+        'illegal',
     ];
 
     protected $appends = [
