@@ -48,17 +48,20 @@ class AuthController extends BaseController
 
         $user = User::where('email', $request->email)->with('favorites')->first();
 
-        if(!$user) {
+        if (!$user) {
             return response()->json([
-                'message' => 'User not found.',
+                'errors' => [
+                    'email' => ['User not found'],
+                ],
             ], 404);
         }
 
         if ($user && !Hash::check($request->password, $user->password)) {
-            return response()->json(
-                'The provided credentials do not match our records.',
-                401,
-            );
+            return response()->json([
+                'errors' => [
+                    'password' => ['Password is incorrect'],
+                ],
+            ], 401);
         }
 
         return response()->json([
@@ -70,14 +73,15 @@ class AuthController extends BaseController
     public function logout()
     {
         $user = User::where('id', auth('sanctum')->user()?->id)->first();
-        if($user) {
+        if ($user) {
             $user->tokens()->delete();
             return response()->json('Logged out', 200);
         }
         return response()->json('User not found', 404);
     }
 
-    public function index () {
+    public function index()
+    {
         return request()->header('Authorization');
         dd(auth('sanctum')->user());
     }

@@ -54,6 +54,7 @@
         v-model="form.password_confirmation"
         label="New password confirmation"
         filled
+        type="password"
         :error="errors?.password_confirmation ? true : false"
         :error-message="
           errors?.password_confirmation ? errors.password_confirmation[0] : ''

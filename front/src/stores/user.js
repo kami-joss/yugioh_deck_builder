@@ -35,7 +35,7 @@ export const useUserStore = defineStore("user", {
           window.location.reload();
         })
         .catch((error) => {
-          console.log(error);
+          return error.response.data.errors;
         });
     },
     async logout() {
