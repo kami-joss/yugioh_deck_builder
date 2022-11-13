@@ -46,7 +46,7 @@ class Deck extends Model
 
     public function cards()
     {
-        return $this->belongsToMany(Card::class, 'decks_cards');
+        return $this->belongsToMany(Card::class, 'decks_cards')->orderBy('type');
     }
 
 

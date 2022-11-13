@@ -21,19 +21,33 @@
     </div>
     <div v-if="$q.platform.is.desktop" class="row index-row">
       <div class="col-5 deck-container">
+        <div>
+          <q-btn
+            icon="sort"
+            flat
+            @click="sortDeck"
+          >
+            <q-tooltip>
+              Sort deck
+            </q-tooltip>
+        </q-btn>
+        </div>
         <div class="row justify-between">
           <p class="text-h6">Main Deck</p>
           <p class="text-h6">{{ deck.main.length }}</p>
         </div>
+
         <deck-list
           :deck="deck.main"
           class="main-deck"
           @remove="removeCardFromDeck"
         />
+
         <div class="row justify-between">
           <p class="text-h6">Extra Deck</p>
           <p class="text-h6">{{ deck.extra.length }}</p>
         </div>
+
         <deck-list
           :deck="deck.extra"
           class="extra-deck"
@@ -196,6 +210,7 @@ import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
 import { useQuasar, Platform } from "quasar";
 import { useUserStore } from "src/stores/user";
 import { useCardStore } from "src/stores/card";
+import { sortBy } from "lodash";
 
 import FiltersCards from "src/components/forms/filters/FiltersCards.vue";
 import YgoCard from "src/components/cards/YgoCard.vue";
@@ -511,6 +526,10 @@ const getDeck = async () => {
           break;
       }
     });
+};
+
+const sortDeck = () => {
+  deck.main = sortBy(deck.main, ["type", "name"]);
 };
 
 onMounted(async () => {

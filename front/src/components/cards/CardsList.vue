@@ -1,9 +1,9 @@
 <template>
   <q-card id="scroll-target-id" class="cardsList-container column">
     <q-infinite-scroll
-      @load="onLoad"
       scroll-target="#scroll-target-id"
       :offset="250"
+      @load="onLoad"
     >
       <div class="row cardsList-grid">
         <ygo-card
@@ -30,6 +30,7 @@
 import { onMounted, reactive, ref, watch, defineEmits, defineProps } from "vue";
 import { useQuasar, Platform } from "quasar";
 import { useCardStore } from "src/stores/card";
+import draggable from "vuedraggable";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
 
