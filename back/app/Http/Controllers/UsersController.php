@@ -153,8 +153,8 @@ class UsersController extends BaseController
                 'name' => 'unique:users,name,' . $user->id . '|max:32',
                 'image_id' => 'nullable|integer',
                 'old_password' => 'nullable|required_with:password,',
-                'password' => 'min:4|same:password_confirmation|nullable',
-                'password_confirmation' => 'min:4|same:password|required_with:password',
+                'password' => 'min:8|same:password_confirmation|nullable|max:32',
+                'password_confirmation' => 'min:8|same:password|required_with:password|max:32',
             ]);
 
             if (Request::get('password')) {
@@ -186,8 +186,8 @@ class UsersController extends BaseController
         } else {
             Request::validate([
                 'email' => 'required|email|unique:users',
-                'password' => 'min:4|same:password_confirmation|nullable',
-                'password_confirmation' => 'min:4|same:password|required_with:password',
+                'password' => 'min:8|same:password_confirmation|max:32|required',
+                'password_confirmation' => 'min:8|same:password|required_with:password|max:32',
                 'name' => 'required|unique:users|max:32',
                 'image_id' => 'nullable|integer',
             ]);

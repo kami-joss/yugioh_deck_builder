@@ -2,8 +2,20 @@
   <div>
     <q-form @submit="onSubmit" class="form-login q-mx-auto">
       <h2>Registration</h2>
-      <q-input v-model="form.name" label="Username" filled />
-      <q-input v-model="form.email" label="E-mail" filled />
+      <q-input
+        v-model="form.name"
+        label="Username"
+        filled
+        :error="errors?.name ? true : false"
+        :error-message="errors?.name ? errors.name[0] : ''"
+      />
+      <q-input
+        v-model="form.email"
+        label="E-mail"
+        filled
+        :error="errors?.email ? true : false"
+        :error-message="errors?.email ? errors.email[0] : ''"
+      />
       <image-uploader
         :hidden-btn="true"
         @added="onImageAdded"
@@ -14,12 +26,18 @@
         label="Password"
         type="password"
         filled
+        :error="errors?.password ? true : false"
+        :error-message="errors?.password ? errors.password[0] : ''"
       />
       <q-input
         v-model="form.password_confirmation"
         label="Password confirmation"
         type="password"
         filled
+        :error="errors?.password_confirmation ? true : false"
+        :error-message="
+          errors?.password_confirmation ? errors.password_confirmation[0] : ''
+        "
       />
       <div class="text-center">
         <q-btn label="Register" type="submit" color="primary" />
@@ -36,7 +54,6 @@ import { useQuasar } from "quasar";
 import { pickBy } from "lodash";
 
 import ImageUploader from "../forms/ImageUploader.vue";
-import { CLOSING } from "ws";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -61,12 +78,21 @@ const uploadImage = async () => {
   fileData.append("file_path", file_path);
   fileData.append("type", "avatar");
 
-  return api.post("/images/upload", fileData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  return api
+    .post("/images/upload", fileData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .catch((error) => {
+      $q.notify({
+        message: error.response.data.message,
+        type: "negative",
+      });
+    });
 };
+
+const errors = ref(null);
 
 const register = async (data) => {
   const res = await api
@@ -81,13 +107,7 @@ const register = async (data) => {
       router.replace("/login");
     })
     .catch((err) => {
-      console.log(err);
-      $q.notify({
-        message: "Subscription failed",
-        color: "negative",
-        position: "top",
-        icon: "cloud_done",
-      });
+      errors.value = err.response.data.errors;
     });
 
   return res;
