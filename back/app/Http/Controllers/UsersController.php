@@ -137,7 +137,9 @@ class UsersController extends BaseController
         if (Request::get('password')) {
             if (Request::get('password') !== Request::get('password_confirmation')) {
                 return response()->json([
-                    'message' => 'Passwords do not match',
+                    'errors' => [
+                        'password_confirmation' => ['The password confirmation does not match.']
+                    ]
                 ], 401);
             }
         }
@@ -158,7 +160,9 @@ class UsersController extends BaseController
             if (Request::get('password')) {
                 if (!Hash::check(Request::get('old_password'), $user->password)) {
                     return response()->json([
-                        'message' => 'Old password is incorrect',
+                        'errors' => [
+                            'old_password' => 'Old password is incorrect',
+                        ]
                     ], 401);
                 }
                 $password = Hash::make(Request::get('password'));
@@ -214,12 +218,14 @@ class UsersController extends BaseController
             }
 
             Request::validate([
-                'password' => 'required',
+                'password_delete' => 'required',
             ]);
 
             if (!Hash::check(Request::get('password'), $user->password)) {
                 return response()->json([
-                    'message' => 'Password is incorrect',
+                    'errors' => [
+                        'password_delete' => 'Password is incorrect',
+                    ]
                 ], 401);
             }
 

@@ -14,15 +14,22 @@
     <q-form @submit="onSubmit">
       <q-input
         v-model="form.name"
-        label="Name"
+        label="Name *"
         filled
-        :rules="[(val) => !!val || 'Name is required']"
+        :rules="[
+          (val) => !!val || 'Name is required',
+          (val) => val.length <= 24 || 'Name must be less than 24 characters',
+        ]"
+        :error="errors?.name ? true : false"
+        :error-message="errors?.name ? errors.name[0] : ''"
       />
       <q-input
         v-model="form.email"
-        label="Email"
+        label="Email *"
         filled
         :rules="[(val) => !!val || 'Email is required']"
+        :error="errors?.email ? true : false"
+        :error-message="errors?.email ? errors.email[0] : ''"
       />
 
       <p class="text-h6">Password</p>
@@ -32,12 +39,25 @@
         label="Old password"
         filled
         type="password"
+        :error="errors?.old_password ? true : false"
+        :error-message="errors?.old_password ? errors.old_password[0] : ''"
       />
-      <q-input v-model="form.password" label="New password" filled />
+      <q-input
+        v-model="form.password"
+        label="New password"
+        filled
+        type="password"
+        :error="errors?.password ? true : false"
+        :error-message="errors?.password ? errors.password[0] : ''"
+      />
       <q-input
         v-model="form.password_confirmation"
         label="New password confirmation"
         filled
+        :error="errors?.password_confirmation ? true : false"
+        :error-message="
+          errors?.password_confirmation ? errors.password_confirmation[0] : ''
+        "
       />
       <div class="row justify-center items-center">
         <q-btn color="primary" label="Save" type="submit" />
@@ -59,6 +79,9 @@
         label="Password"
         filled
         type="password"
+        :error="errors?.password_delete ? true : false"
+        :error-message="errors?.password_deleted ? errors.delete[0] : ''"
+        :rules="[(val) => !!val || 'Password is required']"
       />
     </modal-confirm>
   </q-card>
@@ -129,25 +152,32 @@ const form = reactive({
   password_confirmation: "",
 });
 
+const errors = ref(null);
+
 const emits = defineEmits(["update:password"]);
 
 const onSubmit = () => {
   const formFormatted = pickBy(form, (val) => val != "");
 
-  api.put(`/users/${user.id}`, formFormatted).then((response) => {
-    $q.notify({
-      message: "Your profile has been updated.",
-      color: "positive",
-      position: "top",
-      icon: "check",
+  api
+    .put(`/users/${user.id}`, formFormatted)
+    .then((response) => {
+      $q.notify({
+        message: "Your profile has been updated.",
+        color: "positive",
+        position: "top",
+        icon: "check",
+      });
+
+      userStore.setUser(response.data.user);
+
+      if (response.data.password) {
+        emits("update:password");
+      }
+    })
+    .catch((error) => {
+      errors.value = error.response.data.errors;
     });
-
-    userStore.setUser(response.data.user);
-
-    if (response.data.password) {
-      emits("update:password");
-    }
-  });
 };
 
 const password_delete = ref("");
@@ -156,7 +186,7 @@ const deleteUser = () => {
   api
     .delete(`/users/${user.id}`, {
       data: {
-        password: password_delete.value,
+        password_delete: password_delete.value,
       },
     })
     .then(() => {
