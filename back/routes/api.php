@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
     Route::get('/{user}', [UsersController::class, 'show']);
     Route::get('/{user}/edit', [UsersController::class, 'edit']);
     Route::get('/{user}/favorites', [UsersController::class, 'favorites']);
+    Route::get('/{user}/decks', [UsersController::class, 'decks']);
     Route::put('/{user}', [UsersController::class, 'update']);
     Route::post('/{user}/favorites', [UsersController::class, 'addFavorite']);
     Route::post('/{user}/avatar', [UsersController::class, 'updateAvatar']);
@@ -63,7 +64,7 @@ Route::middleware('auth:sanctum')->prefix('/decks')->group(function() {
     route::post('/', [DecksController::class, 'store']);
     Route::post('/{deck}/clone', [DecksController::class, 'clone']);
     route::put('/{deck}', [DecksController::class, 'update']);
-    route::delete('/{deck}', [DecksController::class, 'delete']);
+    route::delete('/{deck}', [DecksController::class, 'destroy']);
 });
 
 Route::post('/images/upload', [ImagesController::class, 'upload']);

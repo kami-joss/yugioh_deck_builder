@@ -32,6 +32,10 @@ const routes = [
         path: "/user/:id/favorites",
         component: () => import("pages/users/UserFavoritesPage.vue"),
       },
+      {
+        path: "/user/:id/decks",
+        component: () => import("pages/users/UserDecksPage.vue"),
+      },
     ],
   },
   {

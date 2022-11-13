@@ -38,4 +38,9 @@ class UserPolicy
     {
         return $user->id === auth('sanctum')->user()->id;
     }
+
+    public function showDecks(User $user)
+    {
+        return $user->id === auth('sanctum')->user()->id;
+    }
 }

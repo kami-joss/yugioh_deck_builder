@@ -248,4 +248,28 @@ class UsersController extends BaseController
 
         return response()->json($user->load(['favorites', 'image']), 200);
     }
+
+    /**
+     * @param User $user
+     * @return \Illuminate\Http\JsonResponse
+     * Return user decks
+     */
+    public function decks(User $user)
+    {
+        if (auth('sanctum')->user()) {
+            if ($user->cannot('showDecks', $user)) {
+                return response()->json('Unauthorized', 403);
+            }
+
+            $decks = $user->decks()
+                ->filtered(request()->only(['search', 'searchBy', 'illegal']))
+                ->with('user:id,name')
+                ->paginate(25)
+                ->withQueryString();
+
+            return response()->json($decks, 200);
+        }
+
+        return response()->json('No user auth', 403);
+    }
 }

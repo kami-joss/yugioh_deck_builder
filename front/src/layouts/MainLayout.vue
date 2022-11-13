@@ -35,9 +35,17 @@
               flat
               dense
               icon="favorite"
-              aria-label="My favorites"
+              aria-label="Davorites"
               label="My favorites"
               @click="router.push(`/user/${userStore.getUser.id}/favorites`)"
+            />
+            <q-btn
+              flat
+              dense
+              icon="style"
+              aria-label="My decks"
+              label="My Decks"
+              @click="router.push(`/user/${userStore.getUser.id}/decks`)"
             />
             <UsersHeaderMenu />
           </div>

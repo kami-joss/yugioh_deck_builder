@@ -117,7 +117,7 @@ class DecksController extends Controller
         $deck->cards()->attach(request()->cards);
     }
 
-    public function delete(Deck $deck)
+    public function destroy(Deck $deck)
     {
         if (auth('sanctum')->user()) {
             $user = User::where('id', auth('sanctum')->user()->id)->first();
@@ -128,7 +128,7 @@ class DecksController extends Controller
 
             $deck->cards()->detach();
             $deck->delete();
-            return response()->json('deleted', 204);
+            return response()->json($user->decks, 204);
         }
     }
 }
