@@ -11,10 +11,12 @@ const routes = [
       {
         path: "/decks/create",
         component: () => import("pages/decks/DeckCreatePage.vue"),
+        name: "deck-create",
       },
       {
         path: "/decks/edit/:id",
         component: () => import("pages/decks/DeckEditPage.vue"),
+        name: "deck-edit",
       },
       {
         path: "/decks",
@@ -27,14 +29,21 @@ const routes = [
       {
         path: "/user/:id",
         component: () => import("pages/users/UserEditPage.vue"),
+        name: "user",
       },
       {
         path: "/user/:id/favorites",
         component: () => import("pages/users/UserFavoritesPage.vue"),
+        name: "user-favorites",
       },
       {
         path: "/user/:id/decks",
         component: () => import("pages/users/UserDecksPage.vue"),
+        name: "user-decks",
+      },
+      {
+        path: "/redirect",
+        component: () => import("pages/auth/RedirectPage.vue"),
       },
     ],
   },
@@ -44,6 +53,7 @@ const routes = [
     children: [
       { path: "", component: () => import("pages/auth/LoginPage.vue") },
     ],
+    name: "login",
   },
   {
     path: "/register",

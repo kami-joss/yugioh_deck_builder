@@ -4,7 +4,7 @@
       v-for="deck in decks"
       :deck="deck"
       :key="deck.id"
-      :buttons="deck.user.id == userStore.getUser.id ? ['delete'] : []"
+      :buttons="deck.user?.id == userStore.getUser?.id ? ['delete'] : []"
       class="col-sm-5 col-md-2 col-lg-1"
     />
   </div>

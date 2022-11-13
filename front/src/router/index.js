@@ -40,12 +40,23 @@ export default route(function (/* { store, ssrContext } */) {
     const userStore = useUserStore();
     const LoggedIn = userStore.getUser;
 
+    const protectedRoutes = [
+      "deck-create",
+      "deck-edit",
+      "user",
+      "user-favorites",
+      "user-decks",
+    ];
+
     if (
       (LoggedIn && to.path === "/login") ||
       (LoggedIn && to.path === "/register")
     ) {
-      // redirect the user to the login page
       return "/";
+    }
+
+    if (!LoggedIn && protectedRoutes.includes(to.name)) {
+      return "/redirect";
     }
   });
 
