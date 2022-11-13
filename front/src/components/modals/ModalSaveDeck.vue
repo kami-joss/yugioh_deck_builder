@@ -19,6 +19,8 @@
           style="width: 100%"
           lazy-rules
           :rules="[(val) => !!val || 'Name is required']"
+          :error="errors?.name ? true : false"
+          :error-message="errors?.name ? errors.name[0] : ''"
         />
         <q-input
           v-model="form.description"
@@ -26,6 +28,8 @@
           style="width: 100%"
           type="textarea"
           placeholder="Enter a description"
+          :error="errors?.description ? true : false"
+          :error-message="errors?.description ? errors.description[0] : ''"
         />
         <q-checkbox v-model="form.isPublic" label="Public" color="teal" />
         <div class="row gap-1">
@@ -61,6 +65,9 @@ const props = defineProps({
   description: {
     type: String,
     default: "",
+  },
+  errors: {
+    type: Object,
   },
 });
 
@@ -98,6 +105,12 @@ watch(
     emits("update:modelValue", val);
   }
 );
+
+watch(props, (val) => {
+  form.name = props.name;
+  form.description = props.description;
+  form.isPublic = props.isPublic;
+});
 </script>
 
 <style scoped>

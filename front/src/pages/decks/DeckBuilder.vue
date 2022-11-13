@@ -156,6 +156,7 @@
       :description="deck.data?.description"
       :name="deck.data?.name"
       :isPublic="deck.data?.public ? true : false"
+      :errors="errors"
       @save="saveDeck"
     >
       <template v-if="warnings.length > 0" #beforeForm>
@@ -231,8 +232,10 @@ const tab = ref("card");
 
 const modalFilters = ref(false);
 const modalCard = ref(false);
-const modalSaveDeck = ref(true);
+const modalSaveDeck = ref(false);
 const waitingApi = ref(false);
+
+const errors = ref(null);
 
 
 cardStore.$subscribe((state) => {
@@ -286,11 +289,7 @@ const saveDeck = (deckOptions) => {
       })
       .catch((err) => {
         waitingApi.value = false;
-        $q.notify({
-          message: "An error occured. Please try again later.",
-          color: "negative",
-          position: "top",
-        });
+        errors.value = err.response.data.errors;
       });
   }
 
@@ -315,11 +314,7 @@ const saveDeck = (deckOptions) => {
       })
       .catch((err) => {
         waitingApi.value = false;
-        $q.notify({
-          message: "An error occured. Please try again later.",
-          color: "negative",
-          position: "top",
-        });
+        errors.value = err.response.data.errors;
       });
   }
 };
