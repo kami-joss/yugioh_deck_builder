@@ -1,29 +1,37 @@
 <template>
-  <q-card class="my-card" @click="router.push(`/decks/${deck.id}`)">
+  <q-card class="deck-cover" @click="router.push(`/decks/${deck.id}`)">
     <q-card-section>
-      <q-item>
-        <q-item-section>
-          <q-item-label> {{ deck.name }} </q-item-label>
-          <q-item-label caption> By {{ deck.user?.name }} </q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-chip
-        v-if="deck.illegal"
-        color="negative"
-        text-color="white"
-        label="Forbidden"
-      />
+      <p>
+        <span class="text-bold"> {{ deck.name }} </span><br />
+        <span class="text-secondary"> By {{ deck.user?.name }}</span>
+      </p>
+      <q-card-action v-if="deck.illegal">
+        <q-chip
+          color="negative"
+          text-color="white"
+          label="Forbidden"
+          dense
+          outline
+        />
+      </q-card-action>
     </q-card-section>
-    <div class="image_container">
-      <q-img
-        :src="deck.image_path"
-        spinner-color="black"
-        style="width: 100%; position: relative"
+    <q-card-section>
+      <div class="image_container">
+        <q-img class="img" :src="deck.image_path" />
+      </div>
+    </q-card-section>
+    <q-card-action
+      v-if="buttons.length > 0"
+      @click.stop="modalDelete = true"
+      class="bg-primary"
+    >
+      <q-btn
+        v-if="buttons.includes('delete')"
+        flat
+        icon="delete"
+        style="width: 100%"
       />
-    </div>
-    <q-item-section v-if="buttons.length > 0" @click.stop="modalDelete = true">
-      <q-btn v-if="buttons.includes('delete')" flat icon="delete" />
-    </q-item-section>
+    </q-card-action>
 
     <!-- Modales -->
     <modal-confirm
@@ -85,10 +93,25 @@ const deleteDeck = async () => {
 
 <style scoped lang="scss">
 .image_container {
-  max-height: 200px;
-  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deck-cover {
+  cursor: pointer;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.deck-cover:hover {
+  background-color: rgb(245, 245, 245, 0.5);
+  transition-duration: 200ms;
 }
 </style>

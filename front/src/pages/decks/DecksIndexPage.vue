@@ -13,7 +13,7 @@
       <decks-list :decks="decks.data" />
     </div>
 
-    <div class="row justify-center q-my-lg">
+    <div class="row justify-center">
       <q-pagination
         v-model="currentPage"
         :max-pages="5"

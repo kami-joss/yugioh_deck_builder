@@ -3,7 +3,11 @@ const routes = [
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/IndexPage.vue") },
+      {
+        path: "",
+        component: () => import("pages/IndexPage.vue"),
+        name: "home",
+      },
       {
         path: "/card/:id",
         component: () => import("pages/cards/ShowCard.vue"),
@@ -21,10 +25,12 @@ const routes = [
       {
         path: "/decks",
         component: () => import("pages/decks/DecksIndexPage.vue"),
+        name: "decks",
       },
       {
         path: "/decks/:id",
         component: () => import("pages/decks/DeckViewPage.vue"),
+        name: "deck-view",
       },
       {
         path: "/user/:id",
