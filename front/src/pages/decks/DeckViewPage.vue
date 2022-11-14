@@ -104,9 +104,9 @@ const getDeck = async () => {
 
   await api.get(`/decks/${route.params.id}`).then((res) => {
     const cards = {
-      main: res.data.cards.filter((card) => !isExtraDeck(card.type)),
-      extra: res.data.cards.filter((card) => isExtraDeck(card.type)),
-      side: [],
+      main: res.data.main_deck,
+      extra: res.data.extra_deck,
+      side: res.data.side_deck,
     };
     deck.value = { ...res.data, cards };
     waitingApi.value = false;

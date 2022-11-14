@@ -2,18 +2,24 @@
   <div>
     <modal-spinner v-model="waitingApi" />
 
-    <h1>My Favorites</h1>
+    <h1 class="text-h4 text-center">My Favorites</h1>
 
     <div class="column gap-2">
       <div class="column items-center">
         <decks-filters v-model="filters" />
         <p class="q-my-md">{{ decks.total }} results found</p>
       </div>
-
-      <decks-list :decks="decks.data" />
     </div>
-
-    <div class="row justify-center q-my-lg">
+    <div class="row justify-between">
+      <decks-list :decks="decks.data" class="col-12 col-md-8" />
+      <div
+        v-if="$q.platform.is.desktop"
+        class="col-4 description-deck-container"
+      >
+        <description-deck v-if="deckShowing" :deck="deckShowing" />
+      </div>
+    </div>
+    <div class="row justify-center q-my-md">
       <q-pagination
         v-model="currentPage"
         :max-pages="5"
@@ -26,28 +32,38 @@
 </template>
 
 <script setup>
-import { api } from "src/boot/axios";
-import { useUserStore } from "src/stores/user";
-import { ref, onMounted, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
+import { api } from "boot/axios";
 import { useRoute, useRouter } from "vue-router";
-import { pickBy } from "lodash";
+import { useQuasar, Platform } from "quasar";
+import { useDeckStore } from "src/stores/deck";
+import { useUserStore } from "src/stores/user";
 
-import DecksList from "src/components/decks/DecksList";
-import ModalSpinner from "src/components/modals/ModalSpinner.vue";
 import DecksFilters from "src/components/forms/decks/DecksFilters.vue";
-import { CLOSING } from "ws";
+import DeckCover from "src/components/decks/DeckCover.vue";
+import ModalSpinner from "src/components/modals/ModalSpinner.vue";
+import DecksList from "src/components/decks/DecksList.vue";
+import DescriptionDeck from "src/components/decks/DescriptionDeck.vue";
 
-const user = useUserStore();
-const route = useRoute();
 const router = useRouter();
+const route = useRoute();
+const deckStore = useDeckStore();
+const userStore = useUserStore();
 
-const decks = ref({});
+const deckShowing = ref(null);
+
+deckStore.$subscribe((state) => {
+  console.log(state);
+  deckShowing.value = state.events.newValue;
+});
+
 const waitingApi = ref(false);
-const currentPage = ref(route.query.page ?? 1);
 
-const fetchDecks = async () => {
+const decks = ref([]);
+const getDecks = async () => {
+  waitingApi.value = true;
   await api
-    .get(`users/${user.getUser.id}/favorites`, {
+    .get(`users/${userStore.getUser.id}/favorites`, {
       params: {
         ...route.query,
       },
@@ -58,6 +74,25 @@ const fetchDecks = async () => {
     });
 };
 
+watch(
+  () => route.query,
+  async (val) => {
+    await getDecks();
+  },
+  { deep: true }
+);
+
+const currentPage = ref(1);
+watch(currentPage, async (val) => {
+  router.push({
+    query: {
+      ...route.query,
+      page: val,
+    },
+  });
+  await getDecks();
+});
+
 const filters = ref({
   search: "",
   searchBy: "Name",
@@ -65,29 +100,35 @@ const filters = ref({
 });
 
 watch(
-  () => filters,
-  async () => {
-    const params = pickBy(filters.value, (f) => f != "");
+  () => filters.value,
+  async (val) => {
     router.push({
       query: {
         ...route.query,
-        ...params,
+        search: filters.value.search,
+        searchBy: filters.value.searchBy,
+        illegal: filters.value.illegal,
       },
     });
   },
   { deep: true }
 );
 
-watch(
-  () => route.query,
-  async (val) => {
-    await fetchDecks();
-  },
-  { deep: true }
-);
-
 onMounted(async () => {
-  waitingApi.value = true;
-  await fetchDecks();
+  await getDecks();
 });
 </script>
+
+<style scoped>
+.deck-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.description-deck-container {
+  position: fixed;
+  right: 0;
+}
+</style>

@@ -34,7 +34,7 @@
         </div>
         <div class="row justify-between">
           <p class="text-h6">Main Deck</p>
-          <p class="text-h6">{{ deck.main.length }}</p>
+          <p class="text-h6">{{ deck.main?.length }}</p>
         </div>
 
         <deck-list
@@ -45,7 +45,7 @@
 
         <div class="row justify-between">
           <p class="text-h6">Extra Deck</p>
-          <p class="text-h6">{{ deck.extra.length }}</p>
+          <p class="text-h6">{{ deck.extra?.length }}</p>
         </div>
 
         <deck-list
@@ -276,22 +276,21 @@ const onSave = () => {
 
 const saveDeck = (deckOptions) => {
   waitingApi.value = true;
-  const cards = [
-    ...deck.main.map((card) => card.id),
-    ...deck.extra.map((card) => card.id),
-    ...deck.side.map((card) => card.id),
-  ];
+
+  const data = {
+    main: deck.main.map((card) => card.id),
+    extra: deck.extra.map((card) => card.id),
+    side: deck.side.map((card) => card.id),
+    image_id: deck.main[0]?.id,
+    public: deckOptions.isPublic,
+    user_id: userStore.user.id,
+    illegal: warnings.value.length > 0,
+    ...deckOptions,
+  }
 
   if (formType.value == "create") {
     api
-      .post("/decks", {
-        ...deckOptions,
-        image_id: deck.main[0]?.id,
-        cards,
-        public: deckOptions.isPublic,
-        user_id: userStore.user.id,
-        illegal: warnings.value.length > 0,
-      })
+      .post("/decks", data)
       .then((res) => {
         waitingApi.value = false;
         router.push(`/decks/${res.data.id}`);
@@ -304,19 +303,14 @@ const saveDeck = (deckOptions) => {
       })
       .catch((err) => {
         waitingApi.value = false;
+        modalSaveDeck.value = true;
         errors.value = err.response.data.errors;
       });
   }
 
   if (formType.value == "edit") {
     api
-      .put(`/decks/${route.params.id}`, {
-        ...deckOptions,
-        cards,
-        public: deckOptions.isPublic,
-        user_id: userStore.user.id,
-        illegal: warnings.value.length > 0,
-      })
+      .put(`/decks/${route.params.id}`, data)
       .then((res) => {
         waitingApi.value = false;
         $q.notify({
@@ -329,6 +323,7 @@ const saveDeck = (deckOptions) => {
       })
       .catch((err) => {
         waitingApi.value = false;
+        modalSaveDeck.value = true;
         errors.value = err.response.data.errors;
       });
   }
@@ -504,14 +499,12 @@ const getDeck = async () => {
     .then((res) => {
       waitingApi.value = false;
       deck.data = res.data;
+      console.log(res.data)
 
-      res.data.cards.forEach((card) => {
-        if (isExtraDeck(card.type)) {
-          deck.extra.push(card);
-        } else {
-          deck.main.push(card);
-        }
-      });
+      deck.extra = res.data.extra_deck;
+      deck.main = res.data.main_deck;
+      deck.side = res.data.side_deck;
+
     })
     .catch((err) => {
       waitingApi.value = false;

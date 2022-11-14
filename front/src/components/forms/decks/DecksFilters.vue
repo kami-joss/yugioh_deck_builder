@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="row">
+    <div class="row gap-1">
       <q-input
         v-model="form.search"
         filled

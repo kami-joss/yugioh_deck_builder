@@ -26,11 +26,21 @@ class Deck extends Model
 
     protected $appends = [
         'image_path',
+        'full_deck',
     ];
 
     public function getImagePathAttribute()
     {
         return asset(Storage::url($this->image?->path));
+    }
+
+    public function getFullDeckAttribute()
+    {
+        return [
+            'main' => $this->mainDeck,
+            'extra' => $this->extraDeck,
+            'side' => $this->sideDeck,
+        ];
     }
 
 
@@ -44,9 +54,24 @@ class Deck extends Model
         return $this->belongsTo(Image::class);
     }
 
-    public function cards()
+    // public function cards()
+    // {
+    //     return $this->belongsToMany(Card::class, 'decks_cards')->orderBy('type');
+    // }
+
+    public function mainDeck()
     {
-        return $this->belongsToMany(Card::class, 'decks_cards')->orderBy('type');
+        return $this->belongsToMany(Card::class, 'main_decks')->orderBy('type');
+    }
+
+    public function extraDeck()
+    {
+        return $this->belongsToMany(Card::class, 'extra_decks')->orderBy('type');
+    }
+
+    public function sideDeck()
+    {
+        return $this->belongsToMany(Card::class, 'side_decks')->orderBy('type');
     }
 
 

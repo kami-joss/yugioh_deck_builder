@@ -1,22 +1,26 @@
 <template>
-  <q-card>
-    <q-card-section>
-      <p class="text-h6">{{ deck.name }}</p>
-      <p class="text-caption">By {{ deck.user?.name }}</p>
-      <p>{{ deck.cards?.main?.length }} cards</p>
-      <q-chip
-        v-if="deck.illegal"
-        color="negative"
-        text-color="white"
-        label="Forbidden"
-      />
-    </q-card-section>
-    <q-card-section>
+  <q-card bordered>
+    <q-card-section horizontal>
+      <q-card-section class="q-mr-xl">
+        <p class="text-h6">{{ deck.name }}</p>
+        <p class="text-caption">By {{ deck.user?.name }}</p>
+        <p>Main: {{ deck.main_deck?.length }} cards</p>
+        <p>Extra: {{ deck.extra_deck?.length }} cards</p>
+        <p>Side: {{ deck.side_deck?.length }} cards</p>
+        <q-chip
+          v-if="deck.illegal"
+          color="negative"
+          text-color="white"
+          label="Forbidden"
+        />
+      </q-card-section>
       <q-img
-        src="https://cdn.quasar.dev/img/parallax2.jpg"
-        style="width: 100%; height: 200px"
+        :src="deck.image_path"
+        style="max-width: 200px"
+        class="image_cover"
       />
     </q-card-section>
+
     <q-card-section>
       <p>
         {{ deck.description }}

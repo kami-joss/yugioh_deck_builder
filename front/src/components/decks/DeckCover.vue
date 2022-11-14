@@ -1,5 +1,10 @@
 <template>
-  <q-card class="deck-cover" @click="router.push(`/decks/${deck.id}`)">
+  <q-card
+    class="deck-cover"
+    @click="router.push(`/decks/${deck.id}`)"
+    @mouseover="onOverDeck"
+    @mouseleave="onLeaveDeck"
+  >
     <q-card-section>
       <p>
         <span class="text-bold"> {{ deck.name }} </span><br />
@@ -49,6 +54,8 @@ import { useUserStore } from "src/stores/user";
 import { api } from "boot/axios";
 import { useRoute, useRouter } from "vue-router";
 import { useQuasar } from "quasar";
+import { useDeckStore } from "src/stores/deck";
+import { debounce } from "lodash";
 
 import ModalConfirm from "src/components/modals/ModalConfirm.vue";
 import ModalSpinner from "../modals/ModalSpinner.vue";
@@ -57,6 +64,7 @@ const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
+const deckStore = useDeckStore();
 
 const waitingApi = ref(false);
 
@@ -72,6 +80,18 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["delete"]);
+
+const onOverDeck = () => {
+  $q.platform.is.desktop && setDeck();
+};
+
+const onLeaveDeck = () => {
+  setDeck.cancel();
+};
+
+const setDeck = debounce(() => {
+  deckStore.setDeck(props.deck);
+}, 500);
 
 const modalDelete = ref(false);
 
