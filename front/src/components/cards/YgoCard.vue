@@ -52,7 +52,32 @@
           v-close-popup
         />
       </div>
-      <FullYgoCard :card="card" />
+      <FullYgoCard :card="card">
+        <!-- <template #before-desc>
+          <q-input
+            v-model="numberToAdd"
+            outlined
+            dense
+            label="Number of cards"
+            type="number"
+            min="1"
+            max="3"
+            :rules="[
+              (val) => (val > 0 && val <= 3) || 'Must be between 1 and 3',
+            ]"
+          />
+          <q-btn
+            color="primary"
+            label="Add to deck"
+            @click="
+              emits('click:add:multiple', {
+                card: props.card,
+                quantity: numberToAdd,
+              })
+            "
+          />
+        </template> -->
+      </FullYgoCard>
     </q-dialog>
   </q-card>
 </template>
@@ -65,6 +90,7 @@ import FullYgoCard from "./FullYgoCard.vue";
 
 const router = useRouter();
 const $q = useQuasar();
+const numberToAdd = ref(1);
 
 const props = defineProps({
   card: {
@@ -90,6 +116,7 @@ const emits = defineEmits([
   "hover:card",
   "add",
   "click:add",
+  "click:add:multiple",
 ]);
 const options = ref(false);
 const modalCard = ref(false);

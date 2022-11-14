@@ -17,7 +17,13 @@ class DecksController extends Controller
     public function index()
     {
         $decks = Deck::public()->filtered(request()->only(['search', 'searchBy', 'illegal']))
-            ->with('user:id,name', 'mainDeck', 'extraDeck', 'sideDeck', 'image:id,path')
+            ->with(
+                'user:id,name',
+                'mainDeck',
+                'extraDeck',
+                'sideDeck',
+                'image:id,path'
+            )
             ->paginate(25)
             ->withQueryString();
         return response()->json($decks, 200);

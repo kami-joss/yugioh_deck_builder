@@ -16,7 +16,7 @@
     <DescSpellCard v-else :card="card" />
     <slot name="after-desc" />
 
-    <q-card bordered v-if="card.status_ban || card.decks?.length">
+    <q-card bordered v-if="card.status_ban || card.main_decks?.length">
       <q-card-section>
         <div v-if="card.status_ban">
           <span> Status: </span
@@ -25,11 +25,11 @@
           </q-chip>
         </div>
         <p
-          v-if="card.decks?.length > 0"
+          v-if="card.main_decks?.length > 0"
           @click="emits('click:show-decks')"
           class="cursor-pointer link"
         >
-          {{ card.decks?.length }} decks plays this card
+          {{ card.main_decks?.length }} decks plays this card
         </p>
       </q-card-section>
     </q-card>

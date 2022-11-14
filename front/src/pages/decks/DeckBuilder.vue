@@ -3,7 +3,7 @@
     <div class="header">
       <q-btn label="Back" icon="arrow_back" flat @click="router.back()" />
       <p class="text-h6">{{ deck.data?.name }}</p>
-      <div>
+      <div class="row gap-1">
         <q-btn
           label="Save"
           icon="save"
@@ -19,7 +19,26 @@
         />
       </div>
     </div>
-    <div v-if="$q.platform.is.desktop" class="row index-row">
+
+    <div v-if="$q.platform.is.desktop" class="row justify-between">
+
+
+      <!-- <cards-list
+        v-if="cards.data"
+        :cards="cards.data"
+        class="col-4"
+        @click:card="addCardToDeck"
+        @load:scroll="onLoad"
+      /> -->
+      <div class="col-3">
+        <full-ygo-card
+          v-if="cardShowing"
+          :card="cardShowing"
+          :key="cardShowing.id"
+          @click:show-decks="modalDecks = true"
+        />
+      </div>
+
       <div class="col-5 deck-container">
         <div>
           <q-btn
@@ -54,15 +73,8 @@
           @remove="removeCardFromDeck"
         />
       </div>
-      <cards-list
-        v-if="cards.data"
-        :cards="cards.data"
-        class="col-4"
-        @click:card="addCardToDeck"
-        @load:scroll="onLoad"
-      />
 
-      <q-card class="column col gap-1 gt-md">
+      <q-card class="column col-3 gap-1 gt-md">
         <q-tabs
           v-model="tab"
           dense
@@ -82,12 +94,19 @@
             <filters-cards @search="onSearch" />
           </q-tab-panel>
           <q-tab-panel name="card">
-            <full-ygo-card
+            <!-- <full-ygo-card
               v-if="cardShowing"
               :card="cardShowing"
               :key="cardShowing.id"
               class="z-10"
-            />
+            /> -->
+            <cards-list
+        v-if="cards.data"
+        :cards="cards.data"
+        class="col-4"
+        @click:card="addCardToDeck"
+        @load:scroll="onLoad"
+      />
           </q-tab-panel>
         </q-tab-panels>
       </q-card>
@@ -200,6 +219,9 @@
     />
 
     <modal-spinner v-model="waitingApi" />
+    <q-dialog v-if="cardShowing" v-model="modalDecks">
+        <mini-decks-list :decks="cardShowing?.main_decks" />
+      </q-dialog>
   </div>
 </template>
 
@@ -221,6 +243,7 @@ import ModalYgoCard from "src/components/modals/ModalYgoCard.vue";
 import ModalSaveDeck from "src/components/modals/ModalSaveDeck.vue";
 import ModalConfirm from "src/components/modals/ModalConfirm.vue";
 import ModalSpinner from "src/components/modals/ModalSpinner.vue";
+import MiniDecksList from "src/components/decks/MiniDecksList.vue";
 
 import { isExtraDeck } from "src/utils/cardUtils";
 
@@ -232,6 +255,7 @@ const $q = useQuasar();
 const cardStore = useCardStore();
 
 
+const modalDecks = ref(false);
 const formType = ref(route.params.id ? "edit" : "create");
 const current_page = ref(1);
 const cards = ref([]);
@@ -242,7 +266,7 @@ const deck = reactive({
   side: [],
   data: null,
 });
-const cardShowing = ref(cardStore);
+const cardShowing = ref(cardStore.getCard);
 const tab = ref("card");
 
 const modalFilters = ref(false);
@@ -351,6 +375,12 @@ const getCards = async (params, load, done) => {
       } else {
         cards.value = res.data;
       }
+
+      if(!cardShowing.value) {
+        cardShowing.value = res.data.data[0];
+      }
+
+      done();
     })
     .catch((err) => {
       console.error(err);
@@ -412,6 +442,7 @@ const canAddToDeck = (card) => {
 };
 
 const addCardToDeck = ({ card, quantity }) => {
+  console.log(card, quantity);
   const copies = countCopyInDeck(card);
 
   if (quantity && canAddToDeck(card)) {

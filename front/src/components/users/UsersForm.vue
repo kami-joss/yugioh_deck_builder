@@ -1,28 +1,35 @@
 <template>
-  <q-card>
+  <q-card class="column items-center">
     <p class="text-h6">
-      {{ user.id ? "Account " + user.name : "Create User" }}
+      {{ user.id ? "Account of " + user.name : "Create User" }}
     </p>
-    <q-uploader
-      style="max-width: 300px"
-      label="Pick an image"
-      :factory="uploadAvatar"
-      max-files="1"
-      accept=".jpg, .jpeg, .png"
-      @rejected="onRejected"
-    />
+    <q-separator />
     <q-form @submit="onSubmit">
-      <q-input
-        v-model="form.name"
-        label="Name *"
-        filled
-        :rules="[
-          (val) => !!val || 'Name is required',
-          (val) => val.length <= 24 || 'Name must be less than 24 characters',
-        ]"
-        :error="errors?.name ? true : false"
-        :error-message="errors?.name ? errors.name[0] : ''"
-      />
+      <div>
+        <p class="text-h6">Avatar</p>
+        <q-uploader
+          style="max-width: 300px"
+          label="Pick an image"
+          :factory="uploadAvatar"
+          max-files="1"
+          accept=".jpg, .jpeg, .png"
+          @rejected="onRejected"
+        />
+      </div>
+      <div>
+        <p class="text-h6">Login</p>
+        <q-input
+          v-model="form.name"
+          label="Name *"
+          filled
+          :rules="[
+            (val) => !!val || 'Name is required',
+            (val) => val.length <= 24 || 'Name must be less than 24 characters',
+          ]"
+          :error="errors?.name ? true : false"
+          :error-message="errors?.name ? errors.name[0] : ''"
+        />
+      </div>
       <q-input
         v-model="form.email"
         label="Email *"
@@ -65,7 +72,7 @@
       </div>
     </q-form>
 
-    <p class="text-negative cursor-pointer" @click="modalDelete = true">
+    <p class="text-negative cursor-pointer q-my-md" @click="modalDelete = true">
       Close my account
     </p>
 
@@ -74,16 +81,20 @@
       text="Warn ! You will delete your account. This action is not reversible."
       @confirm="deleteUser"
     >
-      <p class="bold">Input your password for continue</p>
-      <q-input
-        v-model="password_delete"
-        label="Password"
-        filled
-        type="password"
-        :error="errors?.password_delete ? true : false"
-        :error-message="errors?.password_deleted ? errors.delete[0] : ''"
-        :rules="[(val) => !!val || 'Password is required']"
-      />
+      <q-card>
+        <q-card-section>
+          <p class="bold">Input your password for continue</p>
+          <q-input
+            v-model="password_delete"
+            label="Password"
+            filled
+            type="password"
+            :error="errors?.password_delete ? true : false"
+            :error-message="errors?.password_deleted ? errors.delete[0] : ''"
+            :rules="[(val) => !!val || 'Password is required']"
+          />
+        </q-card-section>
+      </q-card>
     </modal-confirm>
   </q-card>
 </template>

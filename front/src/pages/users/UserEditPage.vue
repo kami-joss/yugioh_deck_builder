@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <modal-spinner
       v-model="modal"
       text="You have changed your password. You go to be redirected to login page."

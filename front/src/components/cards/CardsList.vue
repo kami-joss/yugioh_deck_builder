@@ -17,6 +17,7 @@
           :clickable="true"
           class="col-4 col-sm-2 cardSelected"
           @click:add="emits('click:card', { card, quantity: 1 })"
+          @click:add:multiple="emits('click:card', { card, quantity })"
           @hover:card="onHoverCard"
         />
       </div>

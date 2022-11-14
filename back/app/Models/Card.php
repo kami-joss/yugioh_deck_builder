@@ -54,6 +54,7 @@ class Card extends Model
         }
     }
 
+
     public function image()
     {
         return $this->belongsTo(Image::class);
@@ -64,9 +65,19 @@ class Card extends Model
         return $this->belongsTo(Image::class, 'image_small_id', 'id');
     }
 
-    public function decks()
+    public function mainDecks()
     {
-        return $this->belongsToMany(Deck::class, 'decks_cards');
+        return $this->hasMany(MainDeck::class);
+    }
+
+    public function extraDeck()
+    {
+        return $this->hasMany(ExtraDeck::class);
+    }
+
+    public function sideDeck()
+    {
+        return $this->hasMany(SideDeck::class);
     }
 
     // SCOPES

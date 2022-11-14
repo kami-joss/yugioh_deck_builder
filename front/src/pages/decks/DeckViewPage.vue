@@ -48,18 +48,18 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col">
+      <div class="row justify-between">
+        <div class="col-md-3">
           <description-deck :deck="deck" />
         </div>
 
-        <div class="col">
+        <div class="col-md-4">
           <deck-list :deck="deck.cards?.main" />
           <hr />
           <deck-list :deck="deck.cards?.extra" />
         </div>
 
-        <div class="col">
+        <div class="col-md-4">
           <q-img :src="cardShowing?.image_path" style="width: 250px" />
           <desc-monster-card
             v-if="cardShowing?.attribute"

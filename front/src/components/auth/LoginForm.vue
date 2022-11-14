@@ -3,12 +3,14 @@
     <h2>Connexion</h2>
     <q-input
       v-model="email"
+      filled
       label="E-mail"
       :error="errors?.email ? true : false"
       :error-message="errors?.email ? errors.email[0] : ''"
     />
     <q-input
       v-model="password"
+      filled
       label="Mot de passe"
       type="password"
       :error="errors?.password ? true : false"
