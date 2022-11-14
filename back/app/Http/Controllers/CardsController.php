@@ -30,18 +30,18 @@ class CardsController extends Controller
         $filters['races'] = $races;
 
 
-        $cards = Card::with('image_small')->filtered($filters)->paginate(30)->withQueryString();
+        $cards = Card::with('image_small', 'decks', 'decks.user')->filtered($filters)->paginate(30)->withQueryString();
         return response()->json($cards, 200);
     }
 
     /**
      * Store a newly created resource in storage.
      * @param \App\Models\Card $card
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Card $card)
     {
-        return response()->json($card->load('image'), 201);
+        return response()->json($card->load('image', 'decks'), 201);
     }
 
     /**

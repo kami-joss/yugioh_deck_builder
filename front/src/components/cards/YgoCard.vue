@@ -1,5 +1,5 @@
 <template>
-  <div class="ygo-card" @click="handleClick" @mouseover="handleHover">
+  <q-card class="ygo-card" @click="handleClick" @mouseover="handleHover">
     <div style="width: 100%; position: relative">
       <q-img :src="card.image_path" spinner-color="black" />
       <q-icon
@@ -41,14 +41,30 @@
         {{ card.name }}
       </p>
     </div>
-  </div>
+
+    <q-dialog v-if="!$q.platform.is.desktop" v-model="modalCard">
+      <div class="">
+        <q-btn
+          icon="close"
+          color="white"
+          text-color="black"
+          round
+          v-close-popup
+        />
+      </div>
+      <FullYgoCard :card="card" />
+    </q-dialog>
+  </q-card>
 </template>
 
 <script setup>
 import { defineEmits, defineProps, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import FullYgoCard from "./FullYgoCard.vue";
 
 const router = useRouter();
+const $q = useQuasar();
 
 const props = defineProps({
   card: {
@@ -69,15 +85,21 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(["click", "hover:card", "add"]);
+const emits = defineEmits([
+  "click:show-card",
+  "hover:card",
+  "add",
+  "click:add",
+]);
 const options = ref(false);
+const modalCard = ref(false);
 
 const handleClick = () => {
-  if (props.clickable) {
-    emits("click", props.card);
-  }
-  // router.push(`/card/${props.card.id}`);
+  $q.platform.is.desktop
+    ? emits("click:add", props.card)
+    : (modalCard.value = true);
 };
+
 const handleHover = () => {
   emits("hover:card", props.card);
 };

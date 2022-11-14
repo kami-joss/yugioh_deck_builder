@@ -1,12 +1,22 @@
 <template>
-  <q-card class="q-px-md q-py-md filters-container">
-    <q-input v-model="search" outlined dense filled :debounce="1000">
-      <template v-slot:append>
-        <q-btn flat rounded icon="search" @click="onSearch" />
-      </template>
-    </q-input>
+  <q-card class="q-px-md q-py-md">
+    <q-toolbar>
+      <q-input
+        v-model="search"
+        outlined
+        dense
+        filled
+        :debounce="1000"
+        :placeholder="'Search a card'"
+        style="width: 100%"
+      >
+        <template v-slot:append>
+          <q-btn flat rounded icon="search" @click="onSearch" />
+        </template>
+      </q-input>
+    </q-toolbar>
 
-    <div class="q-pa-lg">
+    <div class="q-pa-lg filters-container">
       <div>
         <q-checkbox
           v-model="cardTypes.monster.value"
@@ -51,7 +61,7 @@
       </div>
     </div>
 
-    <div class="row justify-center">
+    <q-toolbar class="row justify-center">
       <q-btn
         unelevated
         rounded
@@ -60,7 +70,7 @@
         icon-right="search"
         @click="onSearch"
       />
-    </div>
+    </q-toolbar>
   </q-card>
 </template>
 
@@ -72,6 +82,7 @@ import FiltersSpells from "./FiltersSpells.vue";
 import FiltersTraps from "./FiltersTraps.vue";
 import { spellRaces, trapRaces } from "../../../utils/cardUtils";
 import { pickBy } from "lodash";
+import { map as lodash_map } from "lodash";
 
 const route = useRoute();
 const emits = defineEmits(["search"]);
@@ -90,6 +101,24 @@ const cardTypes = reactive({
     value: false,
   },
 });
+
+watch(
+  () => cardTypes,
+  (newVal) => {
+    if (!newVal.monster.value) {
+      Object.keys(monstersForm.value).forEach((key) => {
+        monstersForm.value[key] = null;
+      });
+    }
+    if (!newVal.spell.value) {
+      lodash_map(spellsForm.value, (val) => (val = null));
+    }
+    if (!newVal.trap.value) {
+      lodash_map(trapsForm.value, (val) => (val = null));
+    }
+  },
+  { deep: true }
+);
 
 const onSearch = () => {
   const form = {
@@ -142,7 +171,7 @@ watch(
 
 <style scoped lang="scss">
 .filters-container {
-  max-height: 90vh;
+  max-height: 75vh;
   height: max-content;
   overflow: auto;
 }

@@ -1,49 +1,47 @@
 <template>
-  <div>
-    <q-card class="card-desc">
-      <q-card-section horizontal class="card-desc_section">
-        <div class="text-h6">{{ card.name }}</div>
+  <q-card class="card-desc" bordered="">
+    <q-card-section horizontal class="card-desc_section">
+      <div class="text-h6">{{ card.name }}</div>
+    </q-card-section>
+
+    <q-separator />
+
+    <q-card-section horizontal class="row items-center">
+      <q-card-section class="col text-center">{{ card.type }}</q-card-section>
+      <q-separator vertical />
+      <q-card-section class="col text-center">
+        level {{ card.level }}
       </q-card-section>
-
-      <q-separator />
-
-      <q-card-section horizontal class="row items-center">
-        <q-card-section class="col text-center">{{ card.type }}</q-card-section>
-        <q-separator vertical />
-        <q-card-section class="col text-center">
-          level {{ card.level }}
-        </q-card-section>
-        <q-separator vertical />
-        <q-card-section class="col text-center">
-          {{ card.attribute }}
-        </q-card-section>
+      <q-separator vertical />
+      <q-card-section class="col text-center">
+        {{ card.attribute }}
       </q-card-section>
+    </q-card-section>
 
-      <q-separator />
+    <q-separator />
 
-      <q-card-section horizontal class="card-desc_section">
-        <div>{{ card.race }}</div>
-      </q-card-section>
+    <q-card-section horizontal class="card-desc_section">
+      <div>{{ card.race }}</div>
+    </q-card-section>
 
-      <q-separator />
+    <q-separator />
 
-      <q-card-section horizontal class="card-desc_section">
-        <p>{{ card.desc }}</p>
-      </q-card-section>
+    <q-card-section horizontal class="card-desc_section">
+      <p>{{ card.desc }}</p>
+    </q-card-section>
 
-      <q-separator />
+    <q-separator />
 
-      <q-card-section horizontal class="row">
-        <q-card-section class="text-center col"
-          >ATK / {{ card.atk }}</q-card-section
-        >
-        <q-separator vertical spaced />
-        <q-card-section class="text-center col"
-          >DEF / {{ card.def }}</q-card-section
-        >
-      </q-card-section>
-    </q-card>
-  </div>
+    <q-card-section horizontal class="row">
+      <q-card-section class="text-center col"
+        >ATK / {{ card.atk }}</q-card-section
+      >
+      <q-separator vertical spaced />
+      <q-card-section class="text-center col"
+        >DEF / {{ card.def }}</q-card-section
+      >
+    </q-card-section>
+  </q-card>
 </template>
 
 <script setup>

@@ -1,5 +1,9 @@
 <template>
-  <q-card id="scroll-target-id" class="cardsList-container column">
+  <q-card
+    id="scroll-target-id"
+    class="cardsList-container column"
+    @mouseleave="onMouseLeave"
+  >
     <q-infinite-scroll
       scroll-target="#scroll-target-id"
       :offset="250"
@@ -11,10 +15,9 @@
           :key="card.id"
           :card="card"
           :clickable="true"
-          :cardSelected="cardSelected"
-          class="col-3 col-md-2 cardSelected"
-          @click="emits('click:card', { card, quantity: 1 })"
-          @hover:card="setCardStore"
+          class="col-4 col-sm-2 cardSelected"
+          @click:add="emits('click:card', { card, quantity: 1 })"
+          @hover:card="onHoverCard"
         />
       </div>
       <template v-slot:loading>
@@ -31,15 +34,27 @@ import { onMounted, reactive, ref, watch, defineEmits, defineProps } from "vue";
 import { useQuasar, Platform } from "quasar";
 import { useCardStore } from "src/stores/card";
 import draggable from "vuedraggable";
+import { debounce } from "lodash";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
 
 const $q = useQuasar();
-const cardSelected = ref(null);
 
 const store = useCardStore();
-const setCardStore = (card) => {
-  store.$patch({ card: card });
+
+const onHoverCard = (card) => {
+  setCardStore(card);
+};
+
+const setCardStore = debounce(
+  (card) => {
+    store.$patch({ card: card });
+  },
+  $q.platform.is.mobile ? 0 : 500
+);
+
+const onMouseLeave = () => {
+  setCardStore.cancel();
 };
 
 const props = defineProps({
@@ -76,13 +91,14 @@ const onLoad = (index, done) => {
   @media (max-width: $breakpoint-md) {
     justify-content: space-around;
   }
-  justify-content: center;
-  gap: 0.3rem;
+  // justify-content: center;
+  // gap: 0.3rem;
 }
 .cardSelected {
   border: solid 3px;
 }
 .cardSelected:hover {
-  border-color: blueviolet;
+  border-color: $warning;
+  transition-duration: 150ms;
 }
 </style>

@@ -42,6 +42,16 @@ return new class extends Migration
                 'scale' => $card['scale'] ?? null,
             ]);
 
+            if($newCard->type == 'Spell Card') {
+                $newCard->race = $newCard->race . ' spell';
+                $newCard->save();
+            }
+
+            if($newCard->type == 'Trap Card') {
+                $newCard->race = $newCard->race . ' trap';
+                $newCard->save();
+            }
+
             if (array_key_exists('card_sets', $card)) {
                 foreach ($card['card_sets'] as $set) {
                     CardSet::create([
@@ -60,9 +70,9 @@ return new class extends Migration
                     $imageExtension = substr($image['image_url'], strrpos($image['image_url'], '.') + 1);
                     // $imageSmallExtension = substr($image['image_url_small'], strrpos($image['image_url_small'], '.') + 1);
 
-                    $imageContent = file_get_contents($image['image_url']);
+                    // $imageContent = file_get_contents($image['image_url']);
                     $path = 'card_images' . DIRECTORY_SEPARATOR . $image['id'] . '.' . $imageExtension;
-                    Storage::put($path, $imageContent);
+                    // Storage::put($path, $imageContent);
 
                     // $imageSmallContent = file_get_contents($image['image_url_small']);
                     // $pathSmall = 'card_images' . DIRECTORY_SEPARATOR . $image['id'] . '_small' . '.' . $imageSmallExtension;

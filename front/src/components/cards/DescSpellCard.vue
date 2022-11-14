@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-card class="card-desc">
+    <q-card class="card-desc" bordered>
       <q-card-section horizontal class="card-desc_section">
         <div class="text-h6">{{ card.name }}</div>
       </q-card-section>

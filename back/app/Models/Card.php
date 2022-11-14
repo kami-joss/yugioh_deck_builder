@@ -31,6 +31,7 @@ class Card extends Model
 
     protected $appends = [
         'image_path',
+        'status_ban',
     ];
 
     // Attributes
@@ -38,6 +39,19 @@ class Card extends Model
     public function getImagePathAttribute()
     {
         return asset(Storage::url($this->image->path));
+    }
+
+    public function getStatusBanAttribute()
+    {
+        if ($this->number_allowed == 0) {
+            return 'Forbidden';
+        } else if ($this->number_allowed == 1) {
+            return 'Limited';
+        } else if ($this->number_allowed == 2) {
+            return 'Semi-limited';
+        } else {
+            return null;
+        }
     }
 
     public function image()
@@ -48,6 +62,11 @@ class Card extends Model
     public function image_small()
     {
         return $this->belongsTo(Image::class, 'image_small_id', 'id');
+    }
+
+    public function decks()
+    {
+        return $this->belongsToMany(Deck::class, 'decks_cards');
     }
 
     // SCOPES
@@ -74,7 +93,7 @@ class Card extends Model
         $query->when($filters['attributes'] ?? false, function ($query, $attributes) use ($filters) {
             $query->where(function ($query) use ($attributes, $filters) {
                 $query->whereIn('attribute', $attributes);
-                if($filters['types']) {
+                if(array_key_exists('types', $filters)) {
                     array_map(function($type) use ($query) {
                         if(str_contains($type, 'spell') || str_contains($type, 'trap')) {
                             $query->orWhere('attribute', null);

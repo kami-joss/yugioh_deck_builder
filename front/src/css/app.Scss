@@ -80,11 +80,6 @@ a {
   background-color: transparent;
 }
 
-.card-desc {
-  width: 100%;
-  max-width: 350px;
-}
-
 .card-desc_section {
   padding: 10px;
 }
@@ -107,4 +102,8 @@ a {
 
 .gap-2 {
   gap: 2rem;
+}
+
+.link:hover {
+  text-decoration: underline;
 }
