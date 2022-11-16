@@ -30,7 +30,7 @@
         @click:card="addCardToDeck"
         @load:scroll="onLoad"
       /> -->
-      <div class="col-3">
+      <div class="card_desc_container col-3 ">
         <full-ygo-card
           v-if="cardShowing"
           :card="cardShowing"
@@ -59,7 +59,7 @@
         <deck-list
           :deck="deck.main"
           class="main-deck"
-          @remove="removeCardFromDeck"
+          @remove="removeCardFromDeck($event, 'main')"
         />
 
         <div class="row justify-between">
@@ -70,7 +70,7 @@
         <deck-list
           :deck="deck.extra"
           class="extra-deck"
-          @remove="removeCardFromDeck"
+          @remove="removeCardFromDeck($event, 'extra')"
         />
       </div>
 
@@ -85,7 +85,7 @@
           narrow-indicator
           inline-label
         >
-          <q-tab name="card" label="Description" icon="card" />
+          <q-tab name="cards" label="Cards" icon="card" />
           <q-tab name="filters" label="Search" icon="search" />
         </q-tabs>
 
@@ -93,20 +93,14 @@
           <q-tab-panel name="filters">
             <filters-cards @search="onSearch" />
           </q-tab-panel>
-          <q-tab-panel name="card">
-            <!-- <full-ygo-card
-              v-if="cardShowing"
-              :card="cardShowing"
-              :key="cardShowing.id"
-              class="z-10"
-            /> -->
+          <q-tab-panel name="cards">
             <cards-list
-        v-if="cards.data"
-        :cards="cards.data"
-        class="col-4"
-        @click:card="addCardToDeck"
-        @load:scroll="onLoad"
-      />
+              v-if="cards.data"
+              :cards="cards.data"
+              class="col-4"
+              @click:card="addCardToDeck"
+              @load:scroll="onLoad"
+            />
           </q-tab-panel>
         </q-tab-panels>
       </q-card>
@@ -116,43 +110,56 @@
 
     <div v-if="$q.platform.is.mobile" class="column col gap-1 lt-md">
       <q-tabs
-        v-model="tab"
-        dense
-        class="text-grey"
-        active-color="primary"
-        indicator-color="primary"
-        align="justify"
-        narrow-indicator
-        inline-label
-      >
-        <q-tab name="cardList" label="List" icon="search" />
-        <q-tab name="deck" label="Deck" icon="" />
-      </q-tabs>
+          v-model="tab"
+          dense
+          class="text-grey"
+          active-color="primary"
+          indicator-color="primary"
+          align="justify"
+          narrow-indicator
+          inline-label
+        >
+          <q-tab name="deck" label="Deck" icon="card" />
+          <q-tab name="cards" label="Cards" icon="search" />
+        </q-tabs>
 
-      <q-tab-panels v-model="tab" animated>
-        <q-tab-panel name="cardList">
-          <cards-list
-            v-if="cards.data"
-            :cards="cards.data"
-            class="col-12 col-lg-4"
-            @load:scroll="onLoad"
-          />
-        </q-tab-panel>
-        <q-tab-panel name="deck">
-          <deck-list
-            :deck="deck.main"
-            class="col-12 col-lg-4"
-            @remove="removeCardFromDeck"
-            @add="addCardToDeck"
-          />
-          <deck-list
-            :deck="deck.extra"
-            class="col-12 col-lg-4"
-            @remove="removeCardFromDeck"
-            @add="addCardToDeck"
-          />
-        </q-tab-panel>
-      </q-tab-panels>
+        <q-tab-panels v-model="tab" animated>
+          <q-tab-panel name="deck">
+            <div class="deck-container">
+
+              <p class="text-h6">Main Deck ({{deck.main.length}})</p>
+              <deck-list
+                :deck="deck.main"
+                class="col-12 col-lg-4"
+                :selectMode="selectMode"
+                @remove="removeCardFromDeck($event, 'main')"
+                @add="addCardToDeck"
+              />
+              <p class="text-h6">Extra Deck ({{deck.extra.length}})</p>
+              <deck-list
+                :deck="deck.extra"
+                class="col-12 col-lg-4"
+                @remove="removeCardFromDeck($event, 'extra')"
+                @add="addCardToDeck"
+              />
+            </div>
+          </q-tab-panel>
+
+
+          <q-tab-panel name="cards">
+            <div>
+              <cards-list
+                v-if="cards.data"
+                :cards="cards.data"
+                class="col-12 col-lg-4"
+                @load:scroll="onLoad"
+                @click:card="addCardToDeck"
+              />
+            </div>
+          </q-tab-panel>
+        </q-tab-panels>
+
+
     </div>
 
     <q-dialog v-model="modalFilters">
@@ -260,14 +267,16 @@ const formType = ref(route.params.id ? "edit" : "create");
 const current_page = ref(1);
 const cards = ref([]);
 const warnings = ref([]);
+const cardShowing = ref(cardStore.getCard);
+const tab = ref('cards');
+const selectMode = ref(false);
+
 const deck = reactive({
   main: [],
   extra: [],
   side: [],
   data: null,
 });
-const cardShowing = ref(cardStore.getCard);
-const tab = ref("card");
 
 const modalFilters = ref(false);
 const modalCard = ref(false);
@@ -358,29 +367,26 @@ const resetAll = () => {
   deck.main = [];
   deck.extra = [];
   deck.side = [];
+
+  modalWarnReset.value = false;
 };
 
-const getCards = async (params, load, done) => {
-  const queryParams = route.query;
+const getCards = async (params, load) => {
+
+  const queryParams = params ?? route.query;
   await api
     .get("/cards", {
-      params: {
-        ...queryParams,
-        ...params,
-      },
+      params: queryParams,
     })
     .then((res) => {
+      if (!cardShowing.value) {
+        cardShowing.value = res.data.data[0];
+      }
       if (load) {
         cards.value.data = [...cards.value.data, ...res.data.data];
       } else {
         cards.value = res.data;
       }
-
-      if(!cardShowing.value) {
-        cardShowing.value = res.data.data[0];
-      }
-
-      done();
     })
     .catch((err) => {
       console.error(err);
@@ -402,7 +408,6 @@ const countCopyInDeck = (card) => {
       }
     });
   }
-
   return count;
 };
 
@@ -442,11 +447,10 @@ const canAddToDeck = (card) => {
 };
 
 const addCardToDeck = ({ card, quantity }) => {
-  console.log(card, quantity);
   const copies = countCopyInDeck(card);
 
   if (quantity && canAddToDeck(card)) {
-    if (quantity + copies > 3) {
+    if ((quantity + copies) > 3) {
       $q.notify({
         message: `You can't have more than 3 of the same card in your deck. Number in deck: ${copies}`,
         color: "negative",
@@ -454,6 +458,7 @@ const addCardToDeck = ({ card, quantity }) => {
         icon: "block",
       });
     } else {
+
       if (copies + quantity > card.number_allowed) {
         $q.notify({
           message: `Warn ! You have more than ${card.number_allowed} copies of this card. Number allowed : ${card.number_allowed}.`,
@@ -484,13 +489,15 @@ const addCardToDeck = ({ card, quantity }) => {
   }
 };
 
-const removeCardFromDeck = (card) => {
-  if (isExtraDeck(card.type)) {
-    let index = deck.extra.indexOf(deck.extra.find((c) => c.id === card.id));
-    deck.extra.splice(index, 1);
-  } else {
+const removeCardFromDeck = ({card, quantity}, deckType) => {
+  if (deckType == "main") {
     let index = deck.main.indexOf(deck.main.find((c) => c.id === card.id));
     deck.main.splice(index, 1);
+  }
+
+  if (deckType == "extra") {
+    let index = deck.extra.indexOf(deck.extra.find((c) => c.id === card.id));
+    deck.extra.splice(index, 1);
   }
 
   const copies = countCopyInDeck(card);
@@ -498,31 +505,37 @@ const removeCardFromDeck = (card) => {
   if (copies <= card.number_allowed) {
     warnings.value = warnings.value.filter((w) => w.id !== card.id);
   }
-
 };
 
 const onLoad = (index, done) => {
   if (current_page.value > cards.value.last_page) {
-    done();
+    done(true);
     return;
   }
   setTimeout(async () => {
     current_page.value++;
-    await getCards({ page: current_page.value }, true);
+    await getCards({ ...route.query, page: current_page.value }, true);
     done();
-  }, 2000);
+  }, 1000);
 };
 
 const onSearch = (form) => {
   current_page.value = 1;
-  tab.value = "card";
+  tab.value = "cards";
   router.push({
     query: {
-      ...route.query,
       ...form,
     },
   });
 };
+
+watch(
+  () => route.query,
+  async (params) => {
+    await getCards({ ...params, page: current_page.value });
+  }
+);
+
 
 const getDeck = async () => {
   await api
@@ -530,7 +543,6 @@ const getDeck = async () => {
     .then((res) => {
       waitingApi.value = false;
       deck.data = res.data;
-      console.log(res.data)
 
       deck.extra = res.data.extra_deck;
       deck.main = res.data.main_deck;
@@ -595,6 +607,10 @@ onMounted(async () => {
   gap: 1rem;
 }
 
+.card_desc_container {
+  max-height: 100vh;
+  overflow-y: auto;
+}
 .main-deck {
   max-height: 50%;
   overflow-y: auto;

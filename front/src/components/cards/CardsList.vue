@@ -10,16 +10,26 @@
       @load="onLoad"
     >
       <div class="row cardsList-grid">
-        <ygo-card
+        <div
           v-for="card in cards"
           :key="card.id"
-          :card="card"
-          :clickable="true"
-          class="col-4 col-sm-2 cardSelected"
-          @click:add="emits('click:card', { card, quantity: 1 })"
-          @click:add:multiple="emits('click:card', { card, quantity })"
-          @hover:card="onHoverCard"
-        />
+          class="col-4 col-sm-3 cardSelected"
+        >
+          <p v-if="!cards.length" class="text-center">No cards found</p>
+          <ygo-card
+            :card="card"
+            clickable
+            :withAdd="
+              (route.name == 'deck-create' || route.name == 'deck-edit') &&
+              $q.platform.is.mobile
+                ? true
+                : false
+            "
+            @click="emits('click:card', { card, quantity: 1 })"
+            @click:add:multiple="emits('click:card', $event)"
+            @hover:card="onHoverCard"
+          />
+        </div>
       </div>
       <template v-slot:loading>
         <div class="row justify-center q-my-md">
@@ -36,12 +46,21 @@ import { useQuasar, Platform } from "quasar";
 import { useCardStore } from "src/stores/card";
 import draggable from "vuedraggable";
 import { debounce } from "lodash";
+import { useRoute } from "vue-router";
 
 import YgoCard from "src/components/cards/YgoCard.vue";
 
 const $q = useQuasar();
 
 const store = useCardStore();
+const route = useRoute();
+
+console.log(route.name);
+
+// const onMultiple = (payload) => {
+//   console.log(payload);
+//   emits("click:add", payload);
+// };
 
 const onHoverCard = (card) => {
   setCardStore(card);
@@ -70,10 +89,10 @@ const emits = defineEmits([
   "hover:card",
   "click:add",
   "load:scroll",
+  "add:multiple",
 ]);
 
 const onLoad = (index, done) => {
-  console.log("onLoad", index);
   emits("load:scroll", index, done);
 };
 </script>

@@ -1,8 +1,11 @@
 <template>
-  <q-card class="column items-center">
+  <q-card class="column items-center q-pa-md">
     <p class="text-h6">
       {{ user.id ? "Account of " + user.name : "Create User" }}
     </p>
+    <q-avatar class="q-mb-md" size="5rem" rounded>
+      <img :src="user.image_path" />
+    </q-avatar>
     <q-separator />
     <q-form @submit="onSubmit">
       <div>

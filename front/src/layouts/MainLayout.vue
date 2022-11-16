@@ -46,6 +46,7 @@
             </q-item-section>
           </q-item>
           <q-item
+            v-if="userStore.getUser"
             clickable
             @click="router.push(`/user/${userStore.user.id}`)"
             class="text-bold text-white bg-primary"
@@ -62,6 +63,12 @@
               <q-btn flat dense round icon="settings" />
             </q-item-section>
           </q-item>
+          <EssentialLink
+            v-else
+            :link="'#/login'"
+            :title="'Login'"
+            :icon="'login'"
+          />
 
           <EssentialLink
             v-for="link in linksList"
@@ -72,7 +79,7 @@
             v-bind="link"
           />
 
-          <q-item>
+          <q-item v-if="userStore.getToken">
             <q-item-section side>
               <q-btn
                 flat
@@ -99,12 +106,6 @@
         <div class="navbar">
           <main-navbar />
         </div>
-
-        <!-- <q-input rounded outlined :bg-color="'white'">
-            <template v-slot:append>
-              <q-btn flat rounded icon="search" />
-            </template>
-          </q-input> -->
 
         <div class="row items-center gap-2">
           <q-toggle

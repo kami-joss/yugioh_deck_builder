@@ -138,6 +138,7 @@ const onSearch = (form) => {
     },
   });
 };
+
 onMounted(async () => {
   await getCards();
 });

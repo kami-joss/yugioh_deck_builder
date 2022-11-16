@@ -139,7 +139,7 @@ const onSearch = () => {
   emits("search", formFormatted);
 };
 
-const search = ref(null);
+const search = ref(route.query.name ?? null);
 
 const monstersForm = ref({
   types: route.query.types ?? [],

@@ -1,6 +1,10 @@
 <template>
-  <q-card class="ygo-card" @click="handleClick" @mouseover="handleHover">
-    <div style="width: 100%; position: relative">
+  <q-card class="ygo-card">
+    <div
+      style="width: 100%; position: relative"
+      @click="handleClick"
+      @mouseover="handleHover"
+    >
       <q-img :src="card.image_path" spinner-color="black" />
       <q-icon
         v-if="card.number_allowed == 0"
@@ -18,6 +22,7 @@
           <strong> Forbidden </strong>
         </q-tooltip>
       </q-icon>
+
       <div
         v-if="card.number_allowed == 2 || card.number_allowed == 1"
         class="icon-warning"
@@ -35,6 +40,40 @@
         </q-tooltip>
       </div>
     </div>
+
+    <q-card-section v-if="withAdd" class="column justify-center gap-1">
+      <q-input
+        v-model.number="numberToAdd"
+        outlined
+        dense
+        type="number"
+        :min="1"
+        :max="3"
+        style="height: 50%"
+        @click.stop
+      />
+      <q-btn
+        color="primary"
+        icon="add"
+        style="height: 50%"
+        @click.stop="
+          emits('click:add:multiple', {
+            card: card,
+            quantity: numberToAdd,
+          })
+        "
+      />
+    </q-card-section>
+
+    <q-card-section v-if="withLessBtn" class="row justify-center">
+      <q-btn
+        color="primary"
+        icon="remove"
+        @click.stop="emits('click', card)"
+        size="sm"
+      />
+    </q-card-section>
+
     <div v-if="label">
       <q-separator spaced dark />
       <p class="text-center">
@@ -42,42 +81,23 @@
       </p>
     </div>
 
-    <q-dialog v-if="!$q.platform.is.desktop" v-model="modalCard">
-      <div class="">
-        <q-btn
-          icon="close"
-          color="white"
-          text-color="black"
-          round
-          v-close-popup
-        />
-      </div>
-      <FullYgoCard :card="card">
-        <!-- <template #before-desc>
-          <q-input
-            v-model="numberToAdd"
-            outlined
-            dense
-            label="Number of cards"
-            type="number"
-            min="1"
-            max="3"
-            :rules="[
-              (val) => (val > 0 && val <= 3) || 'Must be between 1 and 3',
-            ]"
-          />
+    <q-dialog
+      v-if="!$q.platform.is.desktop"
+      v-model="modalCard"
+      class="row items-top"
+    >
+      <div bordered>
+        <div class="row justify-end q-ma-md">
           <q-btn
-            color="primary"
-            label="Add to deck"
-            @click="
-              emits('click:add:multiple', {
-                card: props.card,
-                quantity: numberToAdd,
-              })
-            "
+            icon="close"
+            color="white"
+            text-color="black"
+            round
+            @click="modalCard = false"
           />
-        </template> -->
-      </FullYgoCard>
+        </div>
+        <FullYgoCard :card="card" />
+      </div>
     </q-dialog>
   </q-card>
 </template>
@@ -109,13 +129,21 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  withAdd: {
+    type: Boolean,
+    default: false,
+  },
+  withLessBtn: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emits = defineEmits([
   "click:show-card",
   "hover:card",
   "add",
-  "click:add",
+  "click",
   "click:add:multiple",
 ]);
 const options = ref(false);
@@ -123,7 +151,7 @@ const modalCard = ref(false);
 
 const handleClick = () => {
   $q.platform.is.desktop
-    ? emits("click:add", props.card)
+    ? emits("click", props.card)
     : (modalCard.value = true);
 };
 
@@ -144,7 +172,6 @@ watch(
 <style scoped lang="scss">
 .ygo-card {
   cursor: pointer;
-  max-height: 200px;
 }
 .icon-forbidden {
   position: absolute;
