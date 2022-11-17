@@ -10,11 +10,11 @@
           v-for="deck in decks"
           :key="deck.id"
           clickable
-          @click="router.push(`/decks/${deck.deck?.id}`)"
+          @click="router.push(`/decks/${deck.id}`)"
         >
           <q-item-section>
-            <q-item-label>{{ deck?.deck?.name }}</q-item-label>
-            <q-item-label caption>{{ deck?.deck?.user?.name }}</q-item-label>
+            <q-item-label>{{ deck.name }}</q-item-label>
+            <q-item-label caption>{{ deck.user?.name }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>

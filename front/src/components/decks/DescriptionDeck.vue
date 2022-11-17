@@ -1,6 +1,6 @@
 <template>
   <q-card bordered>
-    <q-card-section horizontal>
+    <q-card-section class="description-container">
       <q-card-section class="q-mr-xl">
         <p class="text-h6">{{ deck.name }}</p>
         <p class="text-caption">By {{ deck.user?.name }}</p>
@@ -12,6 +12,13 @@
           color="negative"
           text-color="white"
           label="Forbidden"
+        />
+        <q-chip
+          v-if="!deck.public"
+          color="positive"
+          text-color="white"
+          label="private"
+          icon="lock"
         />
       </q-card-section>
       <q-img
@@ -39,3 +46,14 @@ const props = defineProps({
   },
 });
 </script>
+
+<style scoped lang="scss">
+.description-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+  }
+}
+</style>

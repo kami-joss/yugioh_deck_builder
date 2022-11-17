@@ -9,7 +9,7 @@ class CardsController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -30,7 +30,10 @@ class CardsController extends Controller
         $filters['races'] = $races;
 
 
-        $cards = Card::with('image_small', 'mainDecks', 'mainDecks.deck.user')->filtered($filters)->paginate(30)->withQueryString();
+        $cards = Card::with('image_small')->filtered($filters)->paginate(30)->withQueryString();
+        $cards->map(function ($card) {
+            $card->append('decks');
+        });
         return response()->json($cards, 200);
     }
 
@@ -41,7 +44,7 @@ class CardsController extends Controller
      */
     public function show(Card $card)
     {
-        return response()->json($card->load('image', 'decks'), 201);
+        return response()->json($card->load('image')->append('decks'), 201);
     }
 
     /**

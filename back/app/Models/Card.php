@@ -54,30 +54,38 @@ class Card extends Model
         }
     }
 
-
     public function image()
     {
         return $this->belongsTo(Image::class);
     }
+
+    //cd "Users\Epitech\Desktop\Josselyn Letty\yugioh_deck_builder\back"
 
     public function image_small()
     {
         return $this->belongsTo(Image::class, 'image_small_id', 'id');
     }
 
-    public function mainDecks()
+    public function extraDecks()
     {
-        return $this->hasMany(MainDeck::class);
-    }
-
-    public function extraDeck()
-    {
-        return $this->hasMany(ExtraDeck::class);
+        return $this->belongsToMany(Deck::class, 'extra_decks');
     }
 
     public function sideDeck()
     {
         return $this->hasMany(SideDeck::class);
+    }
+
+    public function mainDecks()
+    {
+        return $this->belongsToMany(Deck::class, 'main_decks')->distinct();
+    }
+
+    public function getDecksAttribute() {
+        $mainDecks = $this->mainDecks->load('user:id,name') ?? [];
+        $extraDecks = $this->extraDecks->load('user:id,name') ?? [];
+
+        return $mainDecks->merge($extraDecks);
     }
 
     // SCOPES

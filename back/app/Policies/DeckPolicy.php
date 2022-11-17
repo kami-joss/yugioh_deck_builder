@@ -20,6 +20,10 @@ class DeckPolicy
         //
     }
 
+    public function show(User $user, Deck $deck) {
+        return $deck->public || $user->id === $deck->user_id;
+    }
+
     public function update(User $user, Deck $deck)
     {
         return $user->id === $deck->user_id;

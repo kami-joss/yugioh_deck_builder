@@ -12,7 +12,7 @@
       <div class="row justify-center items-center q-ma-md">
         <p>
           You have an account ?
-          <a href="#/login" class="text-white"> Login </a>
+          <q-btn label="Login" @click="router.push('/login')" />
         </p>
       </div>
     </div>

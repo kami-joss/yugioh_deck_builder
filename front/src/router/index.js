@@ -7,6 +7,7 @@ import {
   createWebHashHistory,
 } from "vue-router";
 import routes from "./routes";
+import { api } from "boot/axios";
 
 /*
  * If not building with SSR mode, you can
@@ -39,6 +40,20 @@ export default route(function (/* { store, ssrContext } */) {
   Router.beforeEach(async (to, from) => {
     const userStore = useUserStore();
     const LoggedIn = userStore.getUser;
+
+    api.interceptors.response.use(
+      function (config) {
+        // console.log(error.response.status);
+        // Do something before request is sent
+        return config;
+      },
+      function (error) {
+        // Do something with request error
+        if (error.response.status === 403) {
+          Router.replace("/redirect");
+        }
+      }
+    );
 
     const protectedRoutes = [
       "deck-create",

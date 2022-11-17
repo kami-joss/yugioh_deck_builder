@@ -10,12 +10,14 @@
       @load="onLoad"
     >
       <div class="row cardsList-grid">
+        <p v-if="cards.length == 0" class="text-center q-ma-xl">
+          No cards found
+        </p>
         <div
           v-for="card in cards"
           :key="card.id"
           class="col-4 col-sm-3 cardSelected"
         >
-          <p v-if="!cards.length" class="text-center">No cards found</p>
           <ygo-card
             :card="card"
             clickable

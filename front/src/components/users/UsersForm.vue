@@ -4,7 +4,7 @@
       {{ user.id ? "Account of " + user.name : "Create User" }}
     </p>
     <q-avatar class="q-mb-md" size="5rem" rounded>
-      <img :src="user.image_path" />
+      <img :src="userStore.user.image_path" />
     </q-avatar>
     <q-separator />
     <q-form @submit="onSubmit">

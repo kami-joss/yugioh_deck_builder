@@ -31,6 +31,7 @@ class DecksController extends Controller
 
     public function show(Deck $deck)
     {
+        $this->authorize('show', $deck);
         $deck->load('user:id,name', 'mainDeck', 'extraDeck', 'sideDeck');
         return response()->json($deck, 200);
     }
@@ -86,9 +87,9 @@ class DecksController extends Controller
             'image_id' => $card_image_id,
             'public' => request()->public
         ]);
-        $deckCopy->mainDeck()->attach(request()->main);
-        $deckCopy->extraDeck()->attach(request()->extra);
-        $deckCopy->sideDeck()->attach(request()->side);
+        $deckCopy->mainDeck()->attach($deck->mainDeck);
+        $deckCopy->extraDeck()->attach($deck->extraDeck);
+        // $deckCopy->sideDeck()->attach(request()->side);
         $deckCopy->save();
 
         return response()->json($deckCopy, 201);

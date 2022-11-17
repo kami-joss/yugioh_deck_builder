@@ -10,13 +10,22 @@
         <span class="text-bold"> {{ deck.name }} </span><br />
         <span class="text-secondary"> By {{ deck.user?.name }}</span>
       </p>
-      <q-card-action v-if="deck.illegal">
+      <q-card-action>
         <q-chip
+          v-if="deck.illegal"
           color="negative"
           text-color="white"
           label="Forbidden"
           dense
           outline
+        />
+        <q-chip
+          v-if="!deck.public"
+          color="positive"
+          outline
+          text-color="white"
+          label="Private"
+          icon="lock"
         />
       </q-card-action>
     </q-card-section>

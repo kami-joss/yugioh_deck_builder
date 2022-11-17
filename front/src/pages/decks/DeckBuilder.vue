@@ -227,7 +227,7 @@
 
     <modal-spinner v-model="waitingApi" />
     <q-dialog v-if="cardShowing" v-model="modalDecks">
-        <mini-decks-list :decks="cardShowing?.main_decks" />
+        <mini-decks-list :decks="cardShowing.decks" />
       </q-dialog>
   </div>
 </template>
@@ -632,5 +632,8 @@ onMounted(async () => {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1rem;
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+  }
 }
 </style>

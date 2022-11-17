@@ -9,7 +9,7 @@
     />
 
     <div v-if="deck">
-      <div class="row justify-between q-mb-md">
+      <div class="header">
         <q-btn label="Back" icon="arrow_back" flat @click="router.back()" />
         <div v-if="userStore.getUser" class="row items-center gap-1">
           <div v-if="deck.user?.id != userStore.getUser?.id" class="row gap-1">
@@ -48,18 +48,20 @@
         </div>
       </div>
 
-      <div class="row justify-between">
+      <div class="deckview-container row justify-between">
         <div class="col-md-3">
           <description-deck :deck="deck" />
         </div>
 
         <div class="col-md-4">
+          <p class="text-h6">Main deck ({{ deck.cards?.main.length }})</p>
           <deck-list :deck="deck.cards?.main" />
           <hr />
+          <p class="text-h6">Extra deck ({{ deck.cards?.extra.length }})</p>
           <deck-list :deck="deck.cards?.extra" />
         </div>
 
-        <div class="col-md-4">
+        <div v-if="$q.platform.is.desktop" class="col-md-4">
           <q-img :src="cardShowing?.image_path" style="width: 250px" />
           <desc-monster-card
             v-if="cardShowing?.attribute"
@@ -203,3 +205,25 @@ onMounted(async () => {
   await getDeck();
 });
 </script>
+
+<style scoped lang="scss">
+.deckview-container {
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  justify-content: space-between;
+  @media screen and (max-width: $breakpoint-md) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+}
+</style>

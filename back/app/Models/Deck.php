@@ -26,7 +26,6 @@ class Deck extends Model
 
     protected $appends = [
         'image_path',
-        'full_deck',
     ];
 
     public function getImagePathAttribute()
