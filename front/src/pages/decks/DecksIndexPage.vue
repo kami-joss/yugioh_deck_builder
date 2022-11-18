@@ -51,7 +51,6 @@ const deckStore = useDeckStore();
 const deckShowing = ref(null);
 
 deckStore.$subscribe((state) => {
-  console.log(state);
   deckShowing.value = state.events.newValue;
 });
 
@@ -68,6 +67,7 @@ const getDecks = async () => {
     })
     .then((res) => {
       decks.value = res.data;
+      deckShowing.value = null;
       waitingApi.value = false;
     });
 };

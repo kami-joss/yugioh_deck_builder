@@ -221,7 +221,7 @@ class UsersController extends BaseController
                 'password_delete' => 'required',
             ]);
 
-            if (!Hash::check(Request::get('password'), $user->password)) {
+            if (!Hash::check(Request::get('password_delete'), $user->password)) {
                 return response()->json([
                     'errors' => [
                         'password_delete' => 'Password is incorrect',
@@ -229,13 +229,16 @@ class UsersController extends BaseController
                 ], 401);
             }
 
-            $user->tokens()->delete();
+
             $user->decks->map(function ($deck) {
-                $deck->cards()->detach();
+                $deck->mainDeck()->detach();
+                $deck->extraDeck()->detach();
             });
             $user->decks()->delete();
             $user->favorites()->detach();
             $user->delete();
+            $user->tokens()->delete();
+
 
             return response()->json('User deleted', 200);
         }

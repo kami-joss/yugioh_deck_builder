@@ -24,7 +24,9 @@
       </div>
 
       <q-dialog v-if="cardShowing" v-model="modalDecks">
-        <mini-decks-list :decks="cardShowing?.decks" />
+        <mini-decks-list
+          :decks="cardShowing?.decks?.filter((deck) => deck.public)"
+        />
       </q-dialog>
     </div>
 

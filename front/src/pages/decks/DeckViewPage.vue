@@ -61,7 +61,7 @@
           <deck-list :deck="deck.cards?.extra" />
         </div>
 
-        <div v-if="$q.platform.is.desktop" class="col-md-4">
+        <div v-if="$q.platform.is.desktop" class="col-md-4 column items-center">
           <q-img :src="cardShowing?.image_path" style="width: 250px" />
           <desc-monster-card
             v-if="cardShowing?.attribute"

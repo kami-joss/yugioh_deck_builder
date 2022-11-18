@@ -120,7 +120,9 @@ const onLoad = (index, done) => {
   border: solid 3px;
 }
 .cardSelected:hover {
-  border-color: $warning;
+  border-color: $primary;
   transition-duration: 150ms;
+  transform: scale(1.2);
+  z-index: 100;
 }
 </style>

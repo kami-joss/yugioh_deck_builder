@@ -51,6 +51,8 @@ export default route(function (/* { store, ssrContext } */) {
         // Do something with request error
         if (error.response.status === 403) {
           Router.replace("/redirect");
+        } else {
+          return Promise.reject(error);
         }
       }
     );

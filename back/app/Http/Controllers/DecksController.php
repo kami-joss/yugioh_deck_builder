@@ -31,9 +31,20 @@ class DecksController extends Controller
 
     public function show(Deck $deck)
     {
-        $this->authorize('show', $deck);
-        $deck->load('user:id,name', 'mainDeck', 'extraDeck', 'sideDeck');
-        return response()->json($deck, 200);
+        $user = User::where('id', auth('sanctum')->user()?->id)->first();
+
+        if(!$deck->public) {
+            if($user?->can('show', $deck)) {
+                $deck->load('user:id,name', 'mainDeck', 'extraDeck', 'sideDeck');
+                return response()->json($deck, 200);
+            } else {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        } else {
+            $deck->load('user:id,name', 'mainDeck', 'extraDeck', 'sideDeck');
+            return response()->json($deck, 200);
+        }
+
     }
 
     public function edit(Deck $deck,)
@@ -85,7 +96,8 @@ class DecksController extends Controller
             'description' => request()->description,
             'user_id' => request()->user_id,
             'image_id' => $card_image_id,
-            'public' => request()->public
+            'public' => request()->public,
+            'illegal' => $deck->illegal,
         ]);
         $deckCopy->mainDeck()->attach($deck->mainDeck);
         $deckCopy->extraDeck()->attach($deck->extraDeck);

@@ -54,6 +54,13 @@ class Card extends Model
         }
     }
 
+    public function getDecksAttribute() {
+        $mainDecks = $this->mainDecks->load('user:id,name') ?? [];
+        $extraDecks = $this->extraDecks->load('user:id,name') ?? [];
+
+        return $mainDecks->merge($extraDecks);
+    }
+
     public function image()
     {
         return $this->belongsTo(Image::class);
@@ -68,7 +75,7 @@ class Card extends Model
 
     public function extraDecks()
     {
-        return $this->belongsToMany(Deck::class, 'extra_decks');
+        return $this->belongsToMany(Deck::class, 'extra_decks')->distinct();
     }
 
     public function sideDeck()
@@ -81,12 +88,12 @@ class Card extends Model
         return $this->belongsToMany(Deck::class, 'main_decks')->distinct();
     }
 
-    public function getDecksAttribute() {
-        $mainDecks = $this->mainDecks->load('user:id,name') ?? [];
-        $extraDecks = $this->extraDecks->load('user:id,name') ?? [];
-
-        return $mainDecks->merge($extraDecks);
+    public function cardSets()
+    {
+        return $this->hasMany(CardSet::class, 'card_id');
     }
+
+
 
     // SCOPES
 

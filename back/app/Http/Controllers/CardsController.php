@@ -30,7 +30,7 @@ class CardsController extends Controller
         $filters['races'] = $races;
 
 
-        $cards = Card::with('image_small')->filtered($filters)->paginate(30)->withQueryString();
+        $cards = Card::with('image_small', 'cardSets')->filtered($filters)->paginate(30)->withQueryString();
         $cards->map(function ($card) {
             $card->append('decks');
         });
@@ -44,7 +44,7 @@ class CardsController extends Controller
      */
     public function show(Card $card)
     {
-        return response()->json($card->load('image')->append('decks'), 201);
+        return response()->json($card->load('image', 'cardSets')->append('decks'), 201);
     }
 
     /**
